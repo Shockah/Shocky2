@@ -6,7 +6,7 @@ public abstract class Module {
 	public abstract String name();
 	public abstract String info();
 	protected boolean canDisable() {return true;}
-	protected String[] staticClasses() {return new String[0];}
+	protected String[] staticClasses() {return new String[]{};}
 	
 	public void onEnable() {}
 	public void onDisable() {}
