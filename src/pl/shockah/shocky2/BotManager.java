@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Set;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.managers.ListenerManager;
+import org.pircbotx.hooks.managers.ThreadedListenerManager;
 
 public class BotManager {
 	protected final List<PircBotX> bots = Util.syncedList(PircBotX.class);
+	protected final ListenerManager<PircBotX> listenerManager = new ThreadedListenerManager<PircBotX>();
 	
 	public PircBotX createBot() {
 		try {
@@ -18,6 +21,8 @@ public class BotManager {
 			bot.setMessageDelay(Data.getInt("bot->messagedelay"));
 			bot.setEncoding(Data.getString("bot->encoding"));
 			bot.setAutoNickChange(true);
+			
+			bot.setListenerManager(listenerManager);
 			return bot;
 		} catch (Exception e) {Shocky.handle(e);}
 		return null;
