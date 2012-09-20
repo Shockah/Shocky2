@@ -65,7 +65,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	public static boolean reload(Module module) {
 		if (module == null) return false;
 		ModuleSource<?> src = module.source;
-		Module m = load(src);
+		Module m = load(src,false);
 		if (m != null) {
 			unload(module);
 			return true;
