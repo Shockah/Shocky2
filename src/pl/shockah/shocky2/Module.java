@@ -14,11 +14,11 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	private static final List<Module> modules = Util.syncedList(Module.class), modulesOn = Util.syncedList(Module.class);
 	private static final Map<String,List<Module>> disabledModules = Collections.synchronizedMap(new HashMap<String,List<Module>>());
 	
-	public static Module load(ModuleSource<?> source) {
-		return load(source,true);
+	public static Module load(ModuleSource<?> source, String moduleClassName) {
+		return load(source,moduleClassName,true);
 	}
-	private static Module load(ModuleSource<?> source, boolean breakIfAlreadyLoaded) {
-		Module module = tryToLoad(source);
+	private static Module load(ModuleSource<?> source, String moduleClassName, boolean breakIfAlreadyLoaded) {
+		Module module = tryToLoad(source,moduleClassName);
 		
 		if (module != null) {
 			if (breakIfAlreadyLoaded) for (int i = 0; i < modules.size(); i++) if (modules.get(i).name().equals(module.name())) return null;
@@ -30,18 +30,18 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		}
 		return module;
 	}
-	private static Module tryToLoad(ModuleSource<?> source) {
+	private static Module tryToLoad(ModuleSource<?> source, String moduleClassName) {
 		Module module = null;
 		try {
 			Class<?> c = null;
-			if (source.source instanceof File) {
-				File file = (File)source.source;
+			if (source.getSource() instanceof File) {
+				File file = (File)source.getSource();
 				String moduleName = file.getName(); 
 				if (moduleName.equals("Module.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString(); else return null;
 				
 				c = new URLClassLoader(new URL[]{file.getParentFile().toURI().toURL()}).loadClass(moduleName);
-			} else if (source.source instanceof URL) {
-				URL url = (URL)source.source;
+			} else if (source.getSource() instanceof URL) {
+				URL url = (URL)source.getSource();
 				String moduleName = url.toString();
 				StringBuilder sb = new StringBuilder(moduleName).reverse();
 				moduleName = new StringBuilder(sb.substring(0,sb.indexOf("/"))).reverse().toString();
@@ -65,7 +65,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	public static boolean reload(Module module) {
 		if (module == null) return false;
 		ModuleSource<?> src = module.source;
-		Module m = load(src,false);
+		Module m = load(src,module.getClass().getName(),false);
 		if (m != null) {
 			unload(module);
 			return true;
@@ -121,7 +121,14 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 				if (f.getName().matches("\\.{1,2}")) continue;
 				if (f.isDirectory()) dirs.add(f);
 				else {
-					Module m = load(new ModuleSource<File>(f));
+					File _f = f;
+					String path = _f.getName();
+					while (!_f.getName().equals("modules")) {
+						path = _f.getName()+"."+path;
+						_f = _f.getParentFile();
+					}
+					
+					Module m = load(new ModuleSource<File>(f),path);
 					if (m != null) ret.add(m);
 				}
 			}

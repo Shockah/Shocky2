@@ -52,4 +52,32 @@ public class BotManager {
 		}
 		return null;
 	}
+	
+	public PircBotX joinChannel(String channel) {
+		if (getBotForChannel(channel) != null) return null;
+		for (int i = 0; i < bots.size(); i++) {
+			PircBotX bot = bots.get(i);
+			if (bot.getChannels().size() < Data.getInt("bot->maxchannels")) {
+				bot.joinChannel(channel);
+				return bot;
+			}
+		}
+		
+		try {
+			PircBotX bot = createBot();
+			bot.connect(Data.getString("bot->server"),Data.getInt("bot->port"));
+			bot.joinChannel(channel);
+			bots.add(bot);
+			return bot;
+		} catch (Exception e) {Shocky.handle(e);}
+		
+		return null;
+	}
+	public PircBotX partChannel(String channel) {
+		PircBotX bot = getBotForChannel(channel);
+		if (bot == null) return null;
+		
+		bot.partChannel(bot.getChannel(channel));
+		return bot;
+	}
 }

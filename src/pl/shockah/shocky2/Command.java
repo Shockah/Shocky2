@@ -28,6 +28,7 @@ public abstract class Command {
 	protected int priority = 1;
 	
 	public abstract String command();
+	public abstract String help();
 	public abstract void call(PircBotX bot, ETarget target, CommandCallback callback, Channel channel, User sender, String message);
 	
 	protected void onAdd() {}

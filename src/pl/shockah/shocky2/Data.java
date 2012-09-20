@@ -8,10 +8,12 @@ public class Data {
 	public static void fillDefault() {
 		cfg.set("bot->verbose",true);
 		cfg.set("bot->server","irc.esper.net");
+		cfg.set("bot->port",6667);
 		cfg.set("bot->encoding","UTF8");
-		cfg.set("bot->name","Shocky");
+		cfg.set("bot->name","ShockyDev");
 		cfg.set("bot->login","Shocky");
 		cfg.set("bot->messagedelay",500);
+		cfg.set("bot->maxchannels",50);
 	}
 	
 	public static Config getConfig() {return cfg;}

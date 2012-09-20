@@ -15,6 +15,7 @@ public class CommandAlias extends Command {
 	}
 	
 	public String command() {return name;}
+	public String help() {return command.help();}
 	public void call(PircBotX bot, ETarget target, CommandCallback callback, Channel channel, User sender, String message) {
 		command.call(bot,target,callback,channel,sender,message);
 	}
