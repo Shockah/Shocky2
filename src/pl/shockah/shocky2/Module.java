@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import org.pircbotx.PircBotX;
 
-public abstract class Module extends ShockyListenerAdapter {
+public abstract class Module extends ShockyListenerAdapter implements Comparable<Module> {
 	private static final List<Module> modules = Util.syncedList(Module.class), modulesOn = Util.syncedList(Module.class);
 	private static final Map<String,List<Module>> disabledModules = Collections.synchronizedMap(new HashMap<String,List<Module>>());
 	
@@ -93,15 +93,11 @@ public abstract class Module extends ShockyListenerAdapter {
 		if (module == null) return false;
 		if (channel != null) {
 			List<Module> disabled;
-			if (!disabledModules.containsKey(channel))
-			{
+			if (!disabledModules.containsKey(channel)) {
 				disabled = new ArrayList<Module>();
 				disabledModules.put(channel, disabled);
-			} else {
-				disabled = disabledModules.get(channel);
-			}
-			if (disabled.contains(module))
-				return false;
+			} else disabled = disabledModules.get(channel);
+			if (disabled.contains(module)) return false;
 			return disabled.add(module);
 		} else {
 			if (!modulesOn.contains(module)) return false;
@@ -110,6 +106,28 @@ public abstract class Module extends ShockyListenerAdapter {
 			modulesOn.remove(module);
 			return true;
 		}
+	}
+	
+	public static ArrayList<Module> loadNewModules() {
+		ArrayList<Module> ret = new ArrayList<Module>();
+		File dir = new File("modules"); dir.mkdir();
+		
+		ArrayList<File> dirs = new ArrayList<File>();
+		dirs.add(dir);
+		
+		while (dirs.isEmpty()) {
+			dir = dirs.remove(0);
+			for (File f : dir.listFiles()) {
+				if (f.getName().matches("\\.{1,2}")) continue;
+				if (f.isDirectory()) dirs.add(f);
+				else {
+					Module m = load(new ModuleSource<File>(f));
+					if (m != null) ret.add(m);
+				}
+			}
+		}
+		Collections.sort(ret);
+		return ret;
 	}
 	
 	private ModuleSource<?> source;
@@ -123,4 +141,13 @@ public abstract class Module extends ShockyListenerAdapter {
 	public void onEnable() {}
 	public void onDisable() {}
 	public void onDie(PircBotX bot) {}
+	
+	public final int compareTo(Module module) {
+		return name().compareTo(module.name());
+	}
+	
+	public final boolean isEnabled(String channel) {
+		if (disabledModules.containsKey(channel) && disabledModules.get(channel).contains(this)) return false;
+		return modulesOn.contains(this);
+	}
 }
