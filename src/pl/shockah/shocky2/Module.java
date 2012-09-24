@@ -34,6 +34,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		
 		if (module != null) {
 			if (breakIfAlreadyLoaded) for (int i = 0; i < modules.size(); i++) if (modules.get(i).name().equals(module.name())) return null;
+			if (module instanceof StaticModule) ((StaticModule)module).loadClasses();
 			
 			modules.add(module);
 			Data.cfg.setNotExists("module-"+module.name(),true);
