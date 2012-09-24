@@ -28,7 +28,7 @@ public class CommandPart extends Command {
 			if (split[1].equalsIgnoreCase("all")) commandPart(callback,null,target,ld);
 			else commandPart(callback,split[1],target,ld);
 		} else {
-			if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
+			if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 			callback.append(help());
 		}
 	}
@@ -45,7 +45,7 @@ public class CommandPart extends Command {
 			}
 		}
 		
-		if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
+		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 		callback.append("Restricted command.");
 		return;
 	}

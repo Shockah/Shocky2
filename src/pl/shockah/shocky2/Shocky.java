@@ -1,6 +1,8 @@
 package pl.shockah.shocky2;
 
+import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.events.MessageEvent;
 
 public class Shocky extends ShockyListenerAdapter {
@@ -12,7 +14,10 @@ public class Shocky extends ShockyListenerAdapter {
 		botManager.listenerManager.addListener(new Shocky());
 		for (Module module : Module.loadNewModules()) System.out.println("Loaded module: "+module.name());
 		
-		new ThreadConsoleInput().start();
+		ThreadConsoleInput tci = new ThreadConsoleInput();
+		tci.setDaemon(true);
+		tci.start();
+		
 		botManager.joinChannel("#shocky");
 	}
 	
@@ -31,11 +36,27 @@ public class Shocky extends ShockyListenerAdapter {
 		Command cmd = Command.getCommand(event.getMessage().substring(1).split("\\s")[0]);
 		if (cmd != null) cmd.call(event.getBot(),ETarget.Channel,callback,event.getChannel(),event.getUser(),event.getMessage());
 		if (callback.length() > 0) {
-			if (callback.type == ETarget.Channel) {
+			if (callback.target == ETarget.Channel) {
 				callback.insert(0,": ");
 				callback.insert(0,event.getUser().getNick());
 			}
-			//send(event.getBot(),callback.type == ETarget.Notice ? ETarget.Notice : ETarget.Channel,callback.targetChannel,callback.targetUser,callback.toString());
+			send(event.getBot(),callback);
+		}
+	}
+	
+	public static void send(PircBotX bot, CommandCallback callback) {
+		send(bot,callback.target,callback.targetChannel,callback.targetUser,callback.toString());
+	}
+	public static void send(PircBotX bot, ETarget target, Channel channel, User user, String message) {
+		String[] lines = message.split("\\\n");
+		
+		for (String line : lines) {
+			switch (target) {
+				case Console: System.out.println(line); break;
+				case Channel: bot.sendMessage(channel,line); break;
+				case Private: bot.sendMessage(user,line); break;
+				case Notice: bot.sendNotice(user,line); break;
+			}
 		}
 	}
 }

@@ -6,7 +6,7 @@ import org.pircbotx.User;
 public class CommandCallback implements CharSequence {
 	public User targetUser;
 	public Channel targetChannel;
-	public ETarget type = ETarget.Channel;
+	public ETarget target = ETarget.Channel;
 	public final StringBuilder output;
 
 	public CommandCallback(StringBuilder sb) {
