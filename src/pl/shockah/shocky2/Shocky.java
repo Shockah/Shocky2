@@ -26,14 +26,14 @@ public class Shocky {
 		CommandCallback callback = new CommandCallback();
 		callback.targetUser = event.getUser();
 		callback.targetChannel = event.getChannel();
-		Command cmd = Command.getCommand(event.getBot(),event.getUser(),event.getChannel().getName(),ETarget.Channel,callback,event.getMessage().substring(1));
+		Command cmd = Command.getCommand(event.getMessage().substring(1).split("\\s")[0]);
 		if (cmd != null) cmd.call(event.getBot(),ETarget.Channel,callback,event.getChannel(),event.getUser(),event.getMessage());
 		if (callback.length()>0) {
 			if (callback.type == ETarget.Channel) {
 				callback.insert(0,": ");
 				callback.insert(0,event.getUser().getNick());
 			}
-			send(event.getBot(),callback.type == ETarget.Notice ? ETarget.Notice : ETarget.Channel,callback.targetChannel,callback.targetUser,callback.toString());
+			//send(event.getBot(),callback.type == ETarget.Notice ? ETarget.Notice : ETarget.Channel,callback.targetChannel,callback.targetUser,callback.toString());
 		}
 	}
 }

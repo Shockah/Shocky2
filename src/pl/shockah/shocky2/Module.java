@@ -4,21 +4,33 @@ import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.pircbotx.PircBotX;
 
 public abstract class Module extends ShockyListenerAdapter implements Comparable<Module> {
 	private static final List<Module> modules = Util.syncedList(Module.class), modulesOn = Util.syncedList(Module.class);
 	private static final Map<String,List<Module>> disabledModules = Collections.synchronizedMap(new HashMap<String,List<Module>>());
 	
-	public static Module load(ModuleSource<?> source, String moduleClassName) {
-		return load(source,moduleClassName,true);
+	public static URLClassLoader createClassLoader(URL... extraURLs) {
+		ArrayList<URL> urls = new ArrayList<URL>();
+		try {
+			urls.add(new File("modules").toURI().toURL());
+			urls.addAll(Arrays.asList(extraURLs));
+		} catch (Exception e) {Shocky.handle(e);}
+		return new URLClassLoader(urls.toArray(new URL[urls.size()]));
 	}
-	private static Module load(ModuleSource<?> source, String moduleClassName, boolean breakIfAlreadyLoaded) {
-		Module module = tryToLoad(source,moduleClassName);
+	
+	public static Module load(ModuleSource<?> source) {
+		return load(source,true);
+	}
+	private static Module load(ModuleSource<?> source, boolean breakIfAlreadyLoaded) {
+		Module module = tryToLoad(source);
 		
 		if (module != null) {
 			if (breakIfAlreadyLoaded) for (int i = 0; i < modules.size(); i++) if (modules.get(i).name().equals(module.name())) return null;
@@ -30,25 +42,27 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		}
 		return module;
 	}
-	private static Module tryToLoad(ModuleSource<?> source, String moduleClassName) {
+	private static Module tryToLoad(ModuleSource<?> source) {
 		Module module = null;
 		try {
 			Class<?> c = null;
-			if (source.getSource() instanceof File) {
-				File file = (File)source.getSource();
+			if (source.source instanceof String) {
+				c = createClassLoader().loadClass((String)source.source);
+			} else if (source.source instanceof File) {
+				File file = (File)source.source;
 				String moduleName = file.getName(); 
 				if (moduleName.equals("Module.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString(); else return null;
 				
-				c = new URLClassLoader(new URL[]{file.getParentFile().toURI().toURL()}).loadClass(moduleName);
-			} else if (source.getSource() instanceof URL) {
-				URL url = (URL)source.getSource();
+				c = createClassLoader().loadClass(moduleName);
+			} else if (source.source instanceof URL) {
+				URL url = (URL)source.source;
 				String moduleName = url.toString();
 				StringBuilder sb = new StringBuilder(moduleName).reverse();
 				moduleName = new StringBuilder(sb.substring(0,sb.indexOf("/"))).reverse().toString();
 				String modulePath = new StringBuilder(url.toString()).delete(0,url.toString().length()-moduleName.length()).toString();
 				if (moduleName.equals("Module.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString(); else return null;
 				
-				c = new URLClassLoader(new URL[]{new URL(modulePath)}).loadClass(moduleName);
+				c = createClassLoader(new URL(modulePath)).loadClass(moduleName);
 			}
 			
 			if (c != null && Module.class.isAssignableFrom(c)) module = (Module)c.newInstance();
@@ -65,7 +79,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	public static boolean reload(Module module) {
 		if (module == null) return false;
 		ModuleSource<?> src = module.source;
-		Module m = load(src,module.getClass().getName(),false);
+		Module m = load(src,false);
 		if (m != null) {
 			unload(module);
 			return true;
@@ -109,6 +123,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	}
 	
 	public static ArrayList<Module> loadNewModules() {
+		ArrayList<String> loadClasses = new ArrayList<String>();
 		ArrayList<Module> ret = new ArrayList<Module>();
 		File dir = new File("modules"); dir.mkdir();
 		
@@ -121,18 +136,34 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 				if (f.getName().matches("\\.{1,2}")) continue;
 				if (f.isDirectory()) dirs.add(f);
 				else {
-					File _f = f;
-					String path = _f.getName();
-					while (!_f.getName().equals("modules")) {
-						path = _f.getName()+"."+path;
-						_f = _f.getParentFile();
+					Pattern pattern = Pattern.compile("$((?:Static)?Module)\\.class^");
+					Matcher matcher = pattern.matcher(f.getName());
+					if (matcher.find()) {
+						String cname = matcher.group(1);
+						File _f = f;
+						while (!f.equals(new File("modules"))) {
+							if (!_f.equals(f)) cname = _f.getName()+"."+cname;
+							_f = _f.getParentFile();
+						}
+						loadClasses.add(cname);
 					}
-					
-					Module m = load(new ModuleSource<File>(f),path);
-					if (m != null) ret.add(m);
 				}
 			}
 		}
+		
+		for (int i = 0; i < loadClasses.size(); i++) {
+			String cname = loadClasses.get(i);
+			if (!cname.endsWith("StaticModule")) continue;
+			Module m = load(new ModuleSource<String>(cname));
+			if (m != null) ret.add(m);
+		}
+		for (int i = 0; i < loadClasses.size(); i++) {
+			String cname = loadClasses.get(i);
+			if (cname.endsWith("StaticModule")) continue;
+			Module m = load(new ModuleSource<String>(cname));
+			if (m != null) ret.add(m);
+		}
+		
 		Collections.sort(ret);
 		return ret;
 	}
@@ -142,15 +173,16 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	public abstract String name();
 	public abstract String info();
 	protected boolean isListener() {return false;}
-	protected boolean canDisable() {return true;}
-	protected String[] staticClasses() {return new String[]{};}
 	
 	public void onEnable() {}
 	public void onDisable() {}
 	public void onDie(PircBotX bot) {}
 	
 	public final int compareTo(Module module) {
-		return name().compareTo(module.name());
+		if (this instanceof StaticModule ^ module instanceof StaticModule) return name().compareTo(module.name());
+		if (this instanceof StaticModule) return -1;
+		if (module instanceof StaticModule) return 1;
+		return 0;
 	}
 	
 	public final boolean isEnabled(String channel) {
