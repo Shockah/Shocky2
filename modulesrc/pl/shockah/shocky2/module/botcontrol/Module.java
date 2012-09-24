@@ -6,5 +6,6 @@ public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 	
 	public void onEnable() {
 		addCommand(new CommandJoin());
+		addCommand(new CommandPart());
 	}
 }

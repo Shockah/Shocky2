@@ -1,5 +1,6 @@
 package pl.shockah.shocky2;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +52,12 @@ public class BotManager {
 			}
 		}
 		return null;
+	}
+	
+	public ArrayList<String> getChannels() {
+		ArrayList<String> ret = new ArrayList<String>();
+		for (int i = 0; i < bots.size(); i++) ret.addAll(bots.get(i).getChannelsNames());
+		return ret;
 	}
 	
 	public PircBotX joinChannel(String channel) {

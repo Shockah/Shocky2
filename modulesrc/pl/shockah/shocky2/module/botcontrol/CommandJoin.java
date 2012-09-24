@@ -15,9 +15,8 @@ public class CommandJoin extends Command {
 		return ".join <channel> - joins <channel>";
 	}
 	public void call(PircBotX bot, ETarget target, CommandCallback callback, Channel channel, User sender, String message) {
-		LoginData ld = sender == null ? null : LoginData.getLoginData(sender);
-		if (ld == null || !ld.isController()) {
-			callback.type = ETarget.Notice;
+		if (sender != null && !LoginData.getLoginData(sender).isController()) {
+			if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
 			callback.append("Restricted command.");
 			return;
 		}
@@ -25,7 +24,7 @@ public class CommandJoin extends Command {
 		String[] split = message.split("\\s");
 		if (split.length != 2) {
 			if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
-			callback.append("");
+			callback.append(help());
 		}
 		
 		Shocky.botManager.joinChannel(split[1]);
