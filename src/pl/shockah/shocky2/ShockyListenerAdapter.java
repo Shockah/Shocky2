@@ -10,9 +10,9 @@ import pl.shockah.shocky2.events.MessageOutEvent;
 import pl.shockah.shocky2.events.NoticeOutEvent;
 import pl.shockah.shocky2.events.PrivateMessageOutEvent;
 
-@SuppressWarnings({"rawtypes","unchecked"}) public class ShockyListenerAdapter extends org.pircbotx.hooks.ListenerAdapter<PircBotX> {
+@SuppressWarnings({"rawtypes","unchecked"}) public class ShockyListenerAdapter extends ListenerAdapter<PircBotX> {
 	static {
-		for (Method curMethod : ListenerAdapter.class.getDeclaredMethods()) {
+		for (Method curMethod : ShockyListenerAdapter.class.getDeclaredMethods()) {
 			if (curMethod.getName().equals("onEvent")) continue;
 			Class curClass = curMethod.getParameterTypes()[0];
 			if (!curClass.isInterface()) {
@@ -21,7 +21,7 @@ import pl.shockah.shocky2.events.PrivateMessageOutEvent;
 				eventToMethod.put(curClass, methods);
 			}
 		}
-		for (Method curMethod : ListenerAdapter.class.getDeclaredMethods()) {
+		for (Method curMethod : ShockyListenerAdapter.class.getDeclaredMethods()) {
 			Class curClass = curMethod.getParameterTypes()[0];
 			if (!curClass.isInterface()) continue;
 			for (Class curEvent : eventToMethod.keySet()) if (curClass.isAssignableFrom(curEvent)) (eventToMethod.get(curEvent)).add(curMethod);

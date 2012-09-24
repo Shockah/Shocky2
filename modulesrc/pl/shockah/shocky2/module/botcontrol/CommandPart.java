@@ -20,45 +20,33 @@ public class CommandPart extends Command {
 	}
 	public void call(PircBotX bot, ETarget target, CommandCallback callback, Channel channel, User sender, String message) {
 		String[] split = message.split("\\s");
+		LoginData ld = LoginData.getLoginData(sender);
+		
 		if (split.length == 1) {
-			if (sender != null) {
-				LoginData ld = LoginData.getLoginData(sender);
-				if (!ld.isOp(channel.getName())) {
-					if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
-					callback.append("Restricted command.");
-					return;
-				}
-				
-				Shocky.botManager.partChannel(channel.getName());
-				return;
-			}
+			commandPart(callback,channel.getName(),target,ld);
 		} else if (split.length == 2) {
-			if (split[1].equalsIgnoreCase("all")) {
-				if (sender != null && !LoginData.getLoginData(sender).isController()) {
-					if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
-					callback.append("Restricted command.");
-					return;
-				}
-				
+			if (split[1].equalsIgnoreCase("all")) commandPart(callback,null,target,ld);
+			else commandPart(callback,split[1],target,ld);
+		} else {
+			if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
+			callback.append(help());
+		}
+	}
+	
+	private void commandPart(CommandCallback callback, String channelName, ETarget target, LoginData ld) {
+		if (target == ETarget.Console || (ld != null && (ld.isController() || (channelName != null && ld.isOp(channelName))))) {
+			if (channelName == null) {
 				ArrayList<String> channels = Shocky.botManager.getChannels();
 				for (String c : channels) Shocky.botManager.partChannel(c);
+				return;
 			} else {
-				if (Shocky.botManager.getChannelWithName(split[1]) == null) {
-					if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
-					callback.append("I'm not in that channel.");
-					return;
-				}
-				
-				if (sender != null && !LoginData.getLoginData(sender).isOp(split[1])) {
-					if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
-					callback.append("Restricted command.");
-					return;
-				}
-				Shocky.botManager.partChannel(split[1]);
+				Shocky.botManager.partChannel(channelName);
+				return;
 			}
 		}
 		
 		if (callback.type != ETarget.Console) callback.type = ETarget.Notice;
-		callback.append(help());
+		callback.append("Restricted command.");
+		return;
 	}
 }

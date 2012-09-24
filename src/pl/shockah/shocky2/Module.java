@@ -131,18 +131,18 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		ArrayList<File> dirs = new ArrayList<File>();
 		dirs.add(dir);
 		
-		while (dirs.isEmpty()) {
+		while (!dirs.isEmpty()) {
 			dir = dirs.remove(0);
 			for (File f : dir.listFiles()) {
 				if (f.getName().matches("\\.{1,2}")) continue;
 				if (f.isDirectory()) dirs.add(f);
 				else {
-					Pattern pattern = Pattern.compile("$((?:Static)?Module)\\.class^");
+					Pattern pattern = Pattern.compile("((?:Static)?Module)\\.class");
 					Matcher matcher = pattern.matcher(f.getName());
 					if (matcher.find()) {
 						String cname = matcher.group(1);
 						File _f = f;
-						while (!f.equals(new File("modules"))) {
+						while (!_f.equals(new File("modules"))) {
 							if (!_f.equals(f)) cname = _f.getName()+"."+cname;
 							_f = _f.getParentFile();
 						}
