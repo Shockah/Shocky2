@@ -24,11 +24,12 @@ public final class LoginData {
 		if (user == null) return null;
 		for (int i = 0; i < list.size(); i++) {
 			LoginData ld = list.get(i);
-			if (ld.nick.equals(user.getNick()) && ld.host.equals(user.getHostmask())) return ld;
+			if (ld.nick.equalsIgnoreCase(user.getNick()) && ld.host.equals(user.getHostmask())) return ld;
 		}
 		
 		LoginData ld = new LoginData(user);
 		list.add(ld);
+		privileges.put(user.getNick().toLowerCase(),Util.syncedList(String.class));
 		return ld;
 	}
 	public static void loadLoginData(User user) {
@@ -61,9 +62,15 @@ public final class LoginData {
 	public static boolean register(User user, String password) {
 		LoginData ld = getLoginData(user);
 		if (loginExists(ld.nick)) return false;
-		pass.put(ld.nick,password);
+		pass.put(ld.nick.toLowerCase(),password);
 		ld.loggedIn = true;
 		return true;
+	}
+	
+	public static List<String> getPrivileges(String nick) {
+		nick = nick.toLowerCase();
+		if (!privileges.containsKey(nick)) privileges.put(nick,Util.syncedList(String.class));
+		return privileges.get(nick);
 	}
 	
 	protected String nick;
@@ -80,10 +87,11 @@ public final class LoginData {
 	}
 	
 	public boolean isController() {
-		return loggedIn && privileges.get(nick).contains("+c");
+		return loggedIn && getPrivileges(nick).contains("+c");
 	}
 	public boolean isVoiced(String channel) {
-		if (loggedIn && privileges.get(nick).contains("+v"+channel)) return true;
+		channel = channel.toLowerCase();
+		if (loggedIn && getPrivileges(nick).contains("+v"+channel)) return true;
 		Channel c = Shocky.botManager.getChannelWithName(channel);
 		
 		Set<User> voices = c.getVoices();
@@ -95,7 +103,8 @@ public final class LoginData {
 		return false;
 	}
 	public boolean isOp(String channel) {
-		if (loggedIn && privileges.get(nick).contains("+o"+channel)) return true;
+		channel = channel.toLowerCase();
+		if (loggedIn && getPrivileges(nick).contains("+o"+channel)) return true;
 		Channel c = Shocky.botManager.getChannelWithName(channel);
 		
 		Set<User> ops = c.getOps();
@@ -108,5 +117,9 @@ public final class LoginData {
 	}
 	public boolean isLoggedIn() {
 		return loggedIn;
+	}
+	
+	public List<String> getPrivileges() {
+		return getPrivileges(nick);
 	}
 }

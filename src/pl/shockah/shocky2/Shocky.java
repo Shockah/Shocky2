@@ -7,6 +7,7 @@ import org.pircbotx.hooks.events.MessageEvent;
 
 public class Shocky extends ShockyListenerAdapter {
 	public static BotManager botManager;
+	public static String quitMessage = "";
 	
 	public static void main(String[] args) {
 		botManager = new BotManager();
@@ -19,6 +20,16 @@ public class Shocky extends ShockyListenerAdapter {
 		tci.start();
 		
 		botManager.joinChannel("#shocky");
+		
+		Runtime.getRuntime().addShutdownHook(new Thread(){
+			public void run() {
+				for (PircBotX bot : botManager.bots) bot.quitServer(quitMessage);
+				for (Module module : Module.getModules()) {
+					module.onDataSave();
+					module.onDisable();
+				}
+			}
+		});
 	}
 	
 	public static void handle(Throwable t) {

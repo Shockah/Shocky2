@@ -15,7 +15,7 @@ public class Data {
 		cfg.set("bot->messagedelay",500);
 		cfg.set("bot->maxchannels",50);
 		
-		cfg.set("bot->commandchars",".`~");
+		cfg.set("bot->commandchars",".");
 	}
 	
 	public static Config getConfig() {return cfg;}

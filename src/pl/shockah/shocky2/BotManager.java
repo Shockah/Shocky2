@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
+import org.pircbotx.User;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
 
@@ -44,11 +45,26 @@ public class BotManager {
 	public Channel getChannelWithName(String channel) {
 		for (int i = 0; i < bots.size(); i++) {
 			PircBotX bot = bots.get(i);
-			Set<Channel> set = bot.getChannels();
-			Iterator<Channel> iterator = set.iterator();
+			Iterator<Channel> iterator = bot.getChannels().iterator();
 			while (iterator.hasNext()) {
 				Channel c = iterator.next();
 				if (c.getName().equalsIgnoreCase(channel)) return c;
+			}
+		}
+		return null;
+	}
+	
+	public User getUserWithName(String user) {
+		for (int i = 0; i < bots.size(); i++) {
+			PircBotX bot = bots.get(i);
+			Iterator<Channel> iterator = bot.getChannels().iterator();
+			while (iterator.hasNext()) {
+				Channel c = iterator.next();
+				Iterator<User> iterator2 = c.getUsers().iterator();
+				while (iterator2.hasNext()) {
+					User u = iterator2.next();
+					if (u.getNick().equalsIgnoreCase(user)) return u;
+				}
 			}
 		}
 		return null;

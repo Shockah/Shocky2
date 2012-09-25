@@ -123,6 +123,10 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		}
 	}
 	
+	public static List<Module> getModules() {
+		return Collections.unmodifiableList(modules);
+	}
+	
 	public static ArrayList<Module> loadNewModules() {
 		ArrayList<String> loadClasses = new ArrayList<String>();
 		ArrayList<Module> ret = new ArrayList<Module>();
@@ -177,6 +181,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	
 	public void onEnable() {}
 	public void onDisable() {}
+	public void onDataSave() {}
 	public void onDie(PircBotX bot) {}
 	
 	public final int compareTo(Module module) {

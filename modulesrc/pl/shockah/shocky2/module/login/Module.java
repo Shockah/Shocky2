@@ -10,6 +10,7 @@ public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 	public void onEnable() {
 		addCommand(new CommandLogin());
 		addCommand(new CommandRegister());
+		addCommand(new CommandPrivileges());
 		
 		Random rnd = new Random();
 		String chars = "0123456789abcdef";
