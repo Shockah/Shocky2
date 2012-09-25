@@ -6,13 +6,14 @@ import org.pircbotx.User;
 import pl.shockah.Security;
 import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
+import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.ETarget;
 import pl.shockah.shocky2.Shocky;
 
-public class CommandLogin extends Command {
-	public String command() {return "login";}
+public class CommandRegister extends Command {
+	public String command() {return "register";}
 	public String help() {
-		return ".login <password> - tries to login with <password>";
+		return ".register <password> - tries to register with <password>";
 	}
 	public void call(PircBotX bot, ETarget target, CommandCallback callback, Channel channel, User sender, String message) {
 		String[] split = message.split("\\s");
@@ -21,14 +22,15 @@ public class CommandLogin extends Command {
 		if (split.length == 2) {
 			LoginData ld = LoginData.getLoginData(sender);
 			if (!ld.isLoggedIn()) {
-				if (LoginData.loginExists(sender.getNick())) {
+				if (!LoginData.loginExists(sender.getNick())) {
 					try {
-						callback.append(LoginData.login(sender,Security.md5(split[1])) ? "Logged in" : "Incorrect password");
+						LoginData.register(sender,Security.md5(split[1]+Data.getConfig().getString("login->md5extra")));
+						callback.append("Registered, logged in.");
 						return;
 					} catch (Exception e) {Shocky.handle(e);}
 				}
 				
-				callback.append("No such login; use .register first");
+				callback.append("Login already exists; use .login instead");
 				return;
 			}
 			
@@ -38,4 +40,4 @@ public class CommandLogin extends Command {
 		
 		callback.append(help());
 	}
-}
+} 
