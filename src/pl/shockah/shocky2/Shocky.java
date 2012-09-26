@@ -8,8 +8,11 @@ import org.pircbotx.hooks.events.MessageEvent;
 public class Shocky extends ShockyListenerAdapter {
 	public static BotManager botManager;
 	public static String quitMessage = "";
+	public static final ClassLoaderProxy clp = new ClassLoaderProxy(null);
 	
 	public static void main(String[] args) {
+		Thread.currentThread().setContextClassLoader(clp);
+		
 		botManager = new BotManager();
 		Data.fillDefault();
 		for (Module module : Module.loadNewModules()) System.out.println("Loaded module: "+module.name());
@@ -21,7 +24,7 @@ public class Shocky extends ShockyListenerAdapter {
 		
 		botManager.joinChannel("#shocky");
 		
-		Runtime.getRuntime().addShutdownHook(new Thread(){
+		/*Runtime.getRuntime().addShutdownHook(new Thread(){
 			public void run() {
 				for (PircBotX bot : botManager.bots) bot.quitServer(quitMessage);
 				for (Module module : Module.getModules()) {
@@ -29,7 +32,7 @@ public class Shocky extends ShockyListenerAdapter {
 					module.onDisable();
 				}
 			}
-		});
+		});*/
 	}
 	
 	public static void handle(Throwable t) {
