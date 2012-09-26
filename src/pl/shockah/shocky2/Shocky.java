@@ -1,5 +1,8 @@
 package pl.shockah.shocky2;
 
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -8,10 +11,16 @@ import org.pircbotx.hooks.events.MessageEvent;
 public class Shocky extends ShockyListenerAdapter {
 	public static BotManager botManager;
 	public static String quitMessage = "";
-	public static final ClassLoaderProxy clp = new ClassLoaderProxy(null);
+	public static URLClassLoader botClassLoader = null;
+	
+	static {
+		try {
+			botClassLoader = new URLClassLoader(new URL[]{new File("modules").toURI().toURL()});
+		} catch (Exception e) {handle(e);}
+	}
 	
 	public static void main(String[] args) {
-		Thread.currentThread().setContextClassLoader(clp);
+		Thread.currentThread().setContextClassLoader(botClassLoader);
 		
 		botManager = new BotManager();
 		Data.fillDefault();
