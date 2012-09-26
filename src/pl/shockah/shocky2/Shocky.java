@@ -12,8 +12,8 @@ public class Shocky extends ShockyListenerAdapter {
 	public static void main(String[] args) {
 		botManager = new BotManager();
 		Data.fillDefault();
-		botManager.listenerManager.addListener(new Shocky());
 		for (Module module : Module.loadNewModules()) System.out.println("Loaded module: "+module.name());
+		botManager.listenerManager.addListener(new Shocky());
 		
 		ThreadConsoleInput tci = new ThreadConsoleInput();
 		tci.setDaemon(true);

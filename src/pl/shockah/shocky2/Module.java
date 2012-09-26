@@ -14,8 +14,20 @@ import java.util.regex.Pattern;
 import org.pircbotx.PircBotX;
 
 public abstract class Module extends ShockyListenerAdapter implements Comparable<Module> {
+	private static final StaticModuleClassLoader staticModuleLoader = new StaticModuleClassLoader();
+	private static final ClassLoader defaultClassLoader;
 	private static final List<Module> modules = Util.syncedList(Module.class), modulesOn = Util.syncedList(Module.class);
 	private static final Map<String,List<Module>> disabledModules = Collections.synchronizedMap(new HashMap<String,List<Module>>());
+	
+	static {
+		defaultClassLoader = Thread.currentThread().getContextClassLoader();
+		
+		try {
+			staticModuleLoader.addURL(new File("modules").toURI().toURL());
+		} catch (Exception e) {Shocky.handle(e);}
+		
+		Thread.currentThread().setContextClassLoader(staticModuleLoader);
+	}
 	
 	public static URLClassLoader createClassLoader(URL... extraURLs) {
 		ArrayList<URL> urls = new ArrayList<URL>();
@@ -44,15 +56,21 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		return module;
 	}
 	private static Module tryToLoad(ModuleSource<?> source) {
+		Thread.currentThread().setContextClassLoader(defaultClassLoader);
+		
 		Module module = null;
 		try {
 			Class<?> c = null;
 			if (source.source instanceof String) {
-				c = createClassLoader().loadClass((String)source.source);
+				String s = (String)source.source;
+				ClassLoader cl = staticModuleLoader;
+				if (!s.equals("StaticModule") && !s.endsWith(".StaticModule")) cl = createClassLoader();
+				c = cl.loadClass((String)source.source);
 			} else if (source.source instanceof File) {
 				File file = (File)source.source;
 				String moduleName = file.getName(); 
-				if (moduleName.equals("Module.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString(); else return null;
+				if (moduleName.equals("Module.class") || moduleName.equals("StaticModule.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString();
+				else return null;
 				
 				c = createClassLoader().loadClass(moduleName);
 			} else if (source.source instanceof URL) {
@@ -61,13 +79,18 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 				StringBuilder sb = new StringBuilder(moduleName).reverse();
 				moduleName = new StringBuilder(sb.substring(0,sb.indexOf("/"))).reverse().toString();
 				String modulePath = new StringBuilder(url.toString()).delete(0,url.toString().length()-moduleName.length()).toString();
-				if (moduleName.equals("Module.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString(); else return null;
+				if (moduleName.equals("Module.class") || moduleName.equals("StaticModule.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString();
+				else return null;
 				
 				c = createClassLoader(new URL(modulePath)).loadClass(moduleName);
 			}
 			
 			if (c != null && Module.class.isAssignableFrom(c)) module = (Module)c.newInstance();
-		} catch (Exception e) {e.printStackTrace();}
+		} catch (Exception e) {
+			Shocky.handle(e);
+		} finally {
+			Thread.currentThread().setContextClassLoader(staticModuleLoader);
+		}
 		return module;
 	}
 	public static boolean unload(Module module) {

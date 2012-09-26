@@ -16,14 +16,15 @@ public class CommandDie extends Command {
 		return ".die [reason] - shutdowns the bot";
 	}
 	public void call(PircBotX bot, ETarget target, CommandCallback callback, Channel channel, User sender, String message) {
-		if (sender != null && !LoginData.getLoginData(sender).isController()) {
-			if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
-			callback.append("Restricted command.");
+		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
+		
+		if (sender == null || LoginData.getLoginData(sender).isController()) {
+			String[] split = message.split("\\s");
+			Shocky.quitMessage = split.length > 1 ? Util.implode(split,1," ") : "";
+			System.exit(0);
 			return;
 		}
 		
-		String[] split = message.split("\\s");
-		Shocky.quitMessage = split.length > 1 ? Util.implode(split,1," ") : "";
-		System.exit(0);
+		callback.append("Restricted command.");
 	}
 }
