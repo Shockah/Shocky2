@@ -6,6 +6,7 @@ import pl.shockah.shocky2.Data;
 public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 	public String name() {return "login";}
 	public String info() {return "Adds a login system";}
+	protected boolean canDisable() {return false;}
 	
 	public void onEnable() {
 		addCommand(new CommandLogin());

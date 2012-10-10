@@ -82,4 +82,11 @@ public class Shocky extends ShockyListenerAdapter {
 			}
 		}
 	}
+	
+	public static void die() {
+		die(null);
+	}
+	public static void die(String reason) {
+		for (PircBotX bot : botManager.bots) for (Module module : Module.getModules()) module.onDie(bot);
+	}
 }

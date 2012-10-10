@@ -1,4 +1,4 @@
-package pl.shockah.shocky2.module.login;
+package pl.shockah.shocky2.module;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -33,7 +33,6 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		
 		if (module != null) {
 			if (breakIfAlreadyLoaded) for (int i = 0; i < modules.size(); i++) if (modules.get(i).name().equals(module.name())) return null;
-			if (module instanceof StaticModule) ((StaticModule)module).loadClasses();
 			
 			modules.add(module);
 			Data.cfg.setNotExists("module-"+module.name(),true);
@@ -180,6 +179,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	public abstract String name();
 	public abstract String info();
 	protected boolean isListener() {return false;}
+	protected boolean canDisable() {return true;}
 	
 	public void onEnable() {}
 	public void onDisable() {}
@@ -187,10 +187,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	public void onDie(PircBotX bot) {}
 	
 	public final int compareTo(Module module) {
-		if (this instanceof StaticModule ^ module instanceof StaticModule) return name().compareTo(module.name());
-		if (this instanceof StaticModule) return -1;
-		if (module instanceof StaticModule) return 1;
-		return 0;
+		return name().compareTo(module.name());
 	}
 	
 	public final boolean isEnabled(String channel) {
