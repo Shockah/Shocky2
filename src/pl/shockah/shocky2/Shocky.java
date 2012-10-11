@@ -22,9 +22,9 @@ public class Shocky extends ShockyListenerAdapter {
 	public static void main(String[] args) {
 		Thread.currentThread().setContextClassLoader(botClassLoader);
 		
+		Data.initMongo();
 		botManager = new BotManager();
-		Data.fillDefault();
-		for (Module module : Module.loadNewModules()) System.out.println("Loaded module: "+module.name());
+		for (Module module : Module.loadNewModules()) System.out.println("Loaded module: "+module.getName());
 		botManager.listenerManager.addListener(new Shocky());
 		
 		ThreadConsoleInput tci = new ThreadConsoleInput();
@@ -49,9 +49,8 @@ public class Shocky extends ShockyListenerAdapter {
 	}
 	
 	public void onMessage(MessageEvent<PircBotX> event) {
-		//if (Data.isBlacklisted(event.getUser())) return;
 		if (event.getMessage().length() <= 1) return;
-		if (!Data.getString(event.getChannel().getName(),"bot->commandchars").contains(""+event.getMessage().charAt(0))) return;
+		if (!((String)Data.getDB().getCollection("bot").findOne(Data.document("key","commandChars")).get("value")).contains(""+event.getMessage().charAt(0))) return;
 		
 		CommandCallback callback = new CommandCallback();
 		callback.targetUser = event.getUser();
@@ -88,5 +87,6 @@ public class Shocky extends ShockyListenerAdapter {
 	}
 	public static void die(String reason) {
 		for (PircBotX bot : botManager.bots) for (Module module : Module.getModules()) module.onDie(bot);
+		for (PircBotX bot : botManager.bots) bot.disconnect();
 	}
 }

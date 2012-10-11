@@ -9,6 +9,7 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.managers.ListenerManager;
 import org.pircbotx.hooks.managers.ThreadedListenerManager;
+import com.mongodb.DBCollection;
 
 public class BotManager {
 	protected final List<PircBotX> bots = Util.syncedList(PircBotX.class);
@@ -16,12 +17,14 @@ public class BotManager {
 	
 	public PircBotX createBot() {
 		try {
+			DBCollection c = Data.getDB().getCollection("bot");
+			
 			PircBotX bot = new PircBotX();
-			bot.setVerbose(Data.getBoolean("bot->verbose"));
-			bot.setName(Data.getString("bot->name"));
-			bot.setLogin(Data.getString("bot->name"));
-			bot.setMessageDelay(Data.getInt("bot->messagedelay"));
-			bot.setEncoding(Data.getString("bot->encoding"));
+			bot.setVerbose((Boolean)c.findOne(Data.document("key","verbose")).get("value"));
+			bot.setName((String)c.findOne(Data.document("key","name")).get("value"));
+			bot.setLogin((String)c.findOne(Data.document("key","login")).get("value"));
+			bot.setMessageDelay((Long)c.findOne(Data.document("key","messageDelay")).get("value"));
+			bot.setEncoding((String)c.findOne(Data.document("key","encoding")).get("value"));
 			bot.setAutoNickChange(true);
 			
 			bot.setListenerManager(listenerManager);
@@ -80,15 +83,17 @@ public class BotManager {
 		if (getBotForChannel(channel) != null) return null;
 		for (int i = 0; i < bots.size(); i++) {
 			PircBotX bot = bots.get(i);
-			if (bot.getChannels().size() < Data.getInt("bot->maxchannels")) {
+			if (bot.getChannels().size() < (Integer)Data.getDB().getCollection("bot").findOne(Data.document("key","maxChannels")).get("value")) {
 				bot.joinChannel(channel);
 				return bot;
 			}
 		}
 		
 		try {
+			DBCollection c = Data.getDB().getCollection("bot");
+			
 			PircBotX bot = createBot();
-			bot.connect(Data.getString("bot->server"),Data.getInt("bot->port"));
+			bot.connect((String)c.findOne(Data.document("key","server")).get("value"),(Integer)c.findOne(Data.document("key","port")).get("value"));
 			bot.joinChannel(channel);
 			bots.add(bot);
 			return bot;

@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.pircbotx.PircBotX;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 
 public abstract class Module extends ShockyListenerAdapter implements Comparable<Module> {
 	private static final List<Module> modules = Util.syncedList(Module.class), modulesOn = Util.syncedList(Module.class);
@@ -32,12 +35,17 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		Module module = tryToLoad(source);
 		
 		if (module != null) {
-			if (breakIfAlreadyLoaded) for (int i = 0; i < modules.size(); i++) if (modules.get(i).name().equals(module.name())) return null;
-			
+			if (breakIfAlreadyLoaded) for (int i = 0; i < modules.size(); i++) if (modules.get(i).getName().equals(module.getName())) return null;
 			modules.add(module);
-			Data.cfg.setNotExists("module-"+module.name(),true);
-			if (Data.cfg.getBoolean("module-"+module.name())) enable(module,null);
-			for (String key : Data.cfg.getKeysSubconfigs()) if (key.startsWith("#") && !Data.getBoolean(key,"module-"+module.name())) disable(module,key);
+			
+			DBCollection c = Data.getDB().getCollection("modules");
+			BasicDBObject doc = Data.document("name",module.getName());
+			if (c.findOne(doc) == null) c.insert(Data.document("name",module.getName(),"enabled",new Object[]{"^",true}));
+			
+			DBObject find = c.findOne(doc);
+			DBObject enabled = (DBObject)find.get("enabled");
+			if ((Boolean)enabled.get("^")) enable(module,null);
+			for (String key : enabled.keySet()) if (key.startsWith("#") && !(Boolean)enabled.get(key)) disable(module,key);
 		}
 		return module;
 	}
@@ -176,8 +184,8 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	
 	private ModuleSource<?> source;
 	
-	public abstract String name();
-	public abstract String info();
+	public abstract String getName();
+	public abstract String getInfo();
 	protected boolean isListener() {return false;}
 	protected boolean canDisable() {return true;}
 	
@@ -187,11 +195,14 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	public void onDie(PircBotX bot) {}
 	
 	public final int compareTo(Module module) {
-		return name().compareTo(module.name());
+		return getName().compareTo(module.getName());
 	}
 	
 	public final boolean isEnabled(String channel) {
 		if (disabledModules.containsKey(channel) && disabledModules.get(channel).contains(this)) return false;
 		return modulesOn.contains(this);
+	}
+	public final DBCollection getCollection() {
+		return Data.getDB().getCollection("module-"+getName());
 	}
 }

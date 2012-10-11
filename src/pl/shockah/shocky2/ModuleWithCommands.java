@@ -10,9 +10,11 @@ public abstract class ModuleWithCommands extends Module {
 		clearCommands();
 	}
 	
-	public final void addCommand(Command cmd) {
-		Command.addCommands(cmd);
-		commands.add(cmd);
+	public final void addCommands(Command... cmds) {
+		for (Command cmd : cmds) {
+			Command.addCommands(cmd);
+			commands.add(cmd);
+		}
 	}
 	public final void clearCommands() {
 		Command.removeCommands(commands.toArray(new Command[commands.size()]));

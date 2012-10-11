@@ -12,6 +12,12 @@ import pl.shockah.shocky2.Shocky;
 import pl.shockah.shocky2.module.LoginData;
 
 public class CommandRegister extends Command {
+	protected final Module parent;
+	
+	public CommandRegister(Module parent) {
+		this.parent = parent;
+	}
+	
 	public String command() {return "register";}
 	public String help() {
 		return ".register <password> - tries to register with <password>";
@@ -25,7 +31,7 @@ public class CommandRegister extends Command {
 			if (!ld.isLoggedIn()) {
 				if (!LoginData.loginExists(sender.getNick())) {
 					try {
-						LoginData.register(sender,Security.md5(split[1]+Data.getConfig().getString("login->md5extra")));
+						LoginData.register(sender,Security.md5(split[1]+(String)parent.getCollection().findOne(Data.document("key","md5extra")).get("value")));
 						callback.append("Registered, logged in.");
 						return;
 					} catch (Exception e) {Shocky.handle(e);}

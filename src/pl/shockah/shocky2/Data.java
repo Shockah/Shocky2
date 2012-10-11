@@ -1,73 +1,56 @@
 package pl.shockah.shocky2;
 
-import pl.shockah.Config;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.Mongo;
 
 public class Data {
-	protected static Config cfg = new Config();
+	protected static Mongo mongo;
+	protected static DB db;
 	
-	public static void fillDefault() {
-		cfg.set("bot->verbose",true);
-		cfg.set("bot->server","irc.esper.net");
-		cfg.set("bot->port",6667);
-		cfg.set("bot->encoding","UTF8");
-		cfg.set("bot->name","ShockyDev");
-		cfg.set("bot->login","Shocky");
-		cfg.set("bot->messagedelay",500);
-		cfg.set("bot->maxchannels",50);
+	protected static void initMongo() {
+		try {
+			mongo = new Mongo();
+			db = mongo.getDB("shocky2");
+			
+			DBCollection c = db.getCollection("bot");
+			Object[] o = new Object[]{
+					"verbose",true,
+					"server","irc.esper.net",
+					"port",6667,
+					"encoding","UTF8",
+					"name","ShockyDev",
+					"login","Shocky",
+					"messageDelay",500L,
+					"maxChannels",50,
+					"commandChars","."
+			};
+			for (int i = 0; i < o.length; i += 2) {
+				BasicDBObject doc = document("key",o[i]);
+				if (c.findOne(doc) == null) {
+					doc.put("value",o[i+1] instanceof Object[] ? document((Object[])o[i+1]) : o[i+1]);
+					System.out.println(c.insert(doc));
+				}
+			}
+		} catch (Exception e) {Shocky.handle(e);}
+	}
+	
+	public static Mongo getMongo() {
+		return mongo;
+	}
+	public static DB getDB() {
+		return db;
+	}
+	
+	public static BasicDBObject document(Object... o) {
+		BasicDBObject doc = new BasicDBObject();
 		
-		cfg.set("bot->commandchars",".");
-	}
-	
-	public static Config getConfig() {return cfg;}
-	public static Config getConfig(String channel) {return cfg.getConfig(channel);}
-	
-	public static String getString(String key) {return cfg.getString(key);}
-	public static boolean getBoolean(String key) {return cfg.getBoolean(key);}
-	public static int getInt(String key) {return cfg.getInt(key);}
-	public static long getLong(String key) {return cfg.getLong(key);}
-	public static float getFloat(String key) {return cfg.getFloat(key);}
-	public static double getDouble(String key) {return cfg.getDouble(key);}
-	
-	public static String getString(String channel, String key) {
-		if (cfg.existsConfig(channel)) {
-			Config c = getConfig(channel);
-			if (c.exists(key)) return c.getString(key);
+		for (int i = 0; i < o.length; i += 2) {
+			assert o[i] instanceof String;
+			doc.put((String)o[i],o[i+1] instanceof Object[] ? document((Object[])o[i+1]) : o[i+1]);
 		}
-		return cfg.getString(key);
-	}
-	public static boolean getBoolean(String channel, String key) {
-		if (cfg.existsConfig(channel)) {
-			Config c = getConfig(channel);
-			if (c.exists(key)) return c.getBoolean(key);
-		}
-		return cfg.getBoolean(key);
-	}
-	public static int getInt(String channel, String key) {
-		if (cfg.existsConfig(channel)) {
-			Config c = getConfig(channel);
-			if (c.exists(key)) return c.getInt(key);
-		}
-		return cfg.getInt(key);
-	}
-	public static long getLong(String channel, String key) {
-		if (cfg.existsConfig(channel)) {
-			Config c = getConfig(channel);
-			if (c.exists(key)) return c.getLong(key);
-		}
-		return cfg.getLong(key);
-	}
-	public static float getFloat(String channel, String key) {
-		if (cfg.existsConfig(channel)) {
-			Config c = getConfig(channel);
-			if (c.exists(key)) return c.getFloat(key);
-		}
-		return cfg.getFloat(key);
-	}
-	public static double getDouble(String channel, String key) {
-		if (cfg.existsConfig(channel)) {
-			Config c = getConfig(channel);
-			if (c.exists(key)) return c.getDouble(key);
-		}
-		return cfg.getDouble(key);
+		
+		return doc;
 	}
 }

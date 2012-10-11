@@ -6,11 +6,18 @@ import org.pircbotx.User;
 import pl.shockah.Security;
 import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
+import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.ETarget;
 import pl.shockah.shocky2.Shocky;
 import pl.shockah.shocky2.module.LoginData;
 
 public class CommandLogin extends Command {
+	protected final Module parent;
+	
+	public CommandLogin(Module parent) {
+		this.parent = parent;
+	}
+	
 	public String command() {return "login";}
 	public String help() {
 		return ".login <password> - tries to login with <password>";
@@ -24,7 +31,7 @@ public class CommandLogin extends Command {
 			if (!ld.isLoggedIn()) {
 				if (LoginData.loginExists(sender.getNick())) {
 					try {
-						callback.append(LoginData.login(sender,Security.md5(split[1])) ? "Logged in" : "Incorrect password");
+						callback.append(LoginData.login(sender,Security.md5(split[1]+(String)parent.getCollection().findOne(Data.document("key","md5extra")).get("value"))) ? "Logged in" : "Incorrect password");
 						return;
 					} catch (Exception e) {Shocky.handle(e);}
 				}
