@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.pircbotx.PircBotX;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
@@ -150,10 +148,8 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 				if (f.getName().matches("\\.{1,2}")) continue;
 				if (f.isDirectory()) dirs.add(f);
 				else {
-					Pattern pattern = Pattern.compile("((?:Static)?Module)\\.class");
-					Matcher matcher = pattern.matcher(f.getName());
-					if (matcher.find()) {
-						String cname = matcher.group(1);
+					if (f.getName().matches("Module\\.class")) {
+						String cname = "Module";
 						File _f = f;
 						while (!_f.equals(new File("modules"))) {
 							if (!_f.equals(f)) cname = _f.getName()+"."+cname;
@@ -167,19 +163,16 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		
 		for (int i = 0; i < loadClasses.size(); i++) {
 			String cname = loadClasses.get(i);
-			if (!cname.endsWith("StaticModule")) continue;
-			Module m = load(new ModuleSource<String>(cname));
-			if (m != null) ret.add(m);
-		}
-		for (int i = 0; i < loadClasses.size(); i++) {
-			String cname = loadClasses.get(i);
-			if (cname.endsWith("StaticModule")) continue;
 			Module m = load(new ModuleSource<String>(cname));
 			if (m != null) ret.add(m);
 		}
 		
 		Collections.sort(ret);
 		return ret;
+	}
+	
+	public static DBCollection getCollection(String moduleName) {
+		return Data.getDB().getCollection("module-"+moduleName);
 	}
 	
 	private ModuleSource<?> source;
@@ -203,6 +196,6 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		return modulesOn.contains(this);
 	}
 	public final DBCollection getCollection() {
-		return Data.getDB().getCollection("module-"+getName());
+		return getCollection(getName());
 	}
 }

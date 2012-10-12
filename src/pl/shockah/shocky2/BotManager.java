@@ -17,14 +17,15 @@ public class BotManager {
 	
 	public PircBotX createBot() {
 		try {
-			DBCollection c = Data.getDB().getCollection("bot");
+			DBCollection c = Data.getDB().getCollection("config");
+			String sub = "bot";
 			
 			PircBotX bot = new PircBotX();
-			bot.setVerbose((Boolean)c.findOne(Data.document("key","verbose")).get("value"));
-			bot.setName((String)c.findOne(Data.document("key","name")).get("value"));
-			bot.setLogin((String)c.findOne(Data.document("key","login")).get("value"));
-			bot.setMessageDelay((Long)c.findOne(Data.document("key","messageDelay")).get("value"));
-			bot.setEncoding((String)c.findOne(Data.document("key","encoding")).get("value"));
+			bot.setVerbose((Boolean)c.findOne(Data.document("key",sub+"->verbose")).get("value"));
+			bot.setName((String)c.findOne(Data.document("key",sub+"->name")).get("value"));
+			bot.setLogin((String)c.findOne(Data.document("key",sub+"->login")).get("value"));
+			bot.setMessageDelay((Long)c.findOne(Data.document("key",sub+"->messageDelay")).get("value"));
+			bot.setEncoding((String)c.findOne(Data.document("key",sub+"->encoding")).get("value"));
 			bot.setAutoNickChange(true);
 			
 			bot.setListenerManager(listenerManager);
@@ -83,17 +84,17 @@ public class BotManager {
 		if (getBotForChannel(channel) != null) return null;
 		for (int i = 0; i < bots.size(); i++) {
 			PircBotX bot = bots.get(i);
-			if (bot.getChannels().size() < (Integer)Data.getDB().getCollection("bot").findOne(Data.document("key","maxChannels")).get("value")) {
+			if (bot.getChannels().size() < (Integer)Data.getDB().getCollection("config").findOne(Data.document("key","bot->maxChannels")).get("value")) {
 				bot.joinChannel(channel);
 				return bot;
 			}
 		}
 		
 		try {
-			DBCollection c = Data.getDB().getCollection("bot");
+			DBCollection c = Data.getDB().getCollection("config");
 			
 			PircBotX bot = createBot();
-			bot.connect((String)c.findOne(Data.document("key","server")).get("value"),(Integer)c.findOne(Data.document("key","port")).get("value"));
+			bot.connect((String)c.findOne(Data.document("key","bot->server")).get("value"),(Integer)c.findOne(Data.document("key","bot->port")).get("value"));
 			bot.joinChannel(channel);
 			bots.add(bot);
 			return bot;

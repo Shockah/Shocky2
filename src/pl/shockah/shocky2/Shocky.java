@@ -50,7 +50,7 @@ public class Shocky extends ShockyListenerAdapter {
 	
 	public void onMessage(MessageEvent<PircBotX> event) {
 		if (event.getMessage().length() <= 1) return;
-		if (!((String)Data.getDB().getCollection("bot").findOne(Data.document("key","commandChars")).get("value")).contains(""+event.getMessage().charAt(0))) return;
+		if (!((String)Data.getDB().getCollection("config").findOne(Data.document("key","bot->commandChars")).get("value")).contains(""+event.getMessage().charAt(0))) return;
 		
 		CommandCallback callback = new CommandCallback();
 		callback.targetUser = event.getUser();

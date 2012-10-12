@@ -9,7 +9,6 @@ import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.ETarget;
 import pl.shockah.shocky2.Shocky;
-import pl.shockah.shocky2.module.LoginData;
 
 public class CommandLogin extends Command {
 	protected final Module parent;

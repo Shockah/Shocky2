@@ -14,7 +14,8 @@ public class Data {
 			mongo = new Mongo();
 			db = mongo.getDB("shocky2");
 			
-			DBCollection c = db.getCollection("bot");
+			DBCollection c = db.getCollection("config");
+			String sub = "bot";
 			Object[] o = new Object[]{
 					"verbose",true,
 					"server","irc.esper.net",
@@ -27,7 +28,7 @@ public class Data {
 					"commandChars","."
 			};
 			for (int i = 0; i < o.length; i += 2) {
-				BasicDBObject doc = document("key",o[i]);
+				BasicDBObject doc = document("key",sub+"->"+o[i]);
 				if (c.findOne(doc) == null) {
 					doc.put("value",o[i+1] instanceof Object[] ? document((Object[])o[i+1]) : o[i+1]);
 					System.out.println(c.insert(doc));

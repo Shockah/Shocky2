@@ -7,7 +7,7 @@ import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.ETarget;
 import pl.shockah.shocky2.Shocky;
-import pl.shockah.shocky2.module.LoginData;
+import pl.shockah.shocky2.module.login.LoginData;
 
 public class CommandJoin extends Command {
 	public String command() {return "join";}
