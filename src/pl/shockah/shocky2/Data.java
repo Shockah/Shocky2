@@ -3,6 +3,7 @@ package pl.shockah.shocky2;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import com.mongodb.Mongo;
 
 public class Data {
@@ -45,6 +46,17 @@ public class Data {
 	}
 	public static DBCollection getCollection() {
 		return db.getCollection("config");
+	}
+	
+	public static Object get(String channel, String key) {
+		DBCollection c = getCollection();
+		if (channel != null) {
+			DBObject find = c.findOne(document("key",channel+"->"+key));
+			if (find != null) return find.get("value");
+		}
+		
+		DBObject find = c.findOne(document("key",key));
+		return find == null ? null : find.get("value");
 	}
 	
 	public static BasicDBObject document(Object... o) {

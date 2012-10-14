@@ -74,6 +74,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 			}
 			
 			if (c != null && Module.class.isAssignableFrom(c)) module = (Module)c.newInstance();
+			module.source = source;
 		} catch (Exception e) {Shocky.handle(e);}
 		return module;
 	}
@@ -130,8 +131,12 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		}
 	}
 	
-	public static List<Module> getModules() {
-		return Collections.unmodifiableList(modules);
+	public static ArrayList<Module> getModules() {
+		return new ArrayList<Module>(modules);
+	}
+	public static Module getModuleByName(String name) {
+		for (int i = 0; i < modules.size(); i++) if (modules.get(i).getName().equals(name)) return modules.get(i);
+		return null;
 	}
 	
 	public static ArrayList<Module> loadNewModules() {
@@ -180,7 +185,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	public abstract String getName();
 	public abstract String getInfo();
 	protected boolean isListener() {return false;}
-	protected boolean canDisable() {return true;}
+	public boolean canDisable() {return true;}
 	
 	public void onEnable() {}
 	public void onDisable() {}
@@ -197,5 +202,18 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 	}
 	public final DBCollection getCollection() {
 		return getCollection(getName());
+	}
+	
+	public final boolean unload() {
+		return unload(this);
+	}
+	public final boolean reload() {
+		return reload(this);
+	}
+	public final boolean enable(String channel) {
+		return enable(this,channel);
+	}
+	public final boolean disable(String channel) {
+		return disable(this,channel);
 	}
 }

@@ -20,7 +20,14 @@ public class CommandDie extends Command {
 		
 		if (sender == null || LoginData.getLoginData(sender.getNick()).isController()) {
 			String[] split = message.split("\\s");
-			if (split.length > 1) Shocky.die(Util.implode(split,1," ")); else Shocky.die();
+			if (split.length > 1) {
+				String reason = Util.implode(split,1," ");
+				for (String chan : Shocky.botManager.getChannels()) {
+					PircBotX botForChannel = Shocky.botManager.getBotForChannel(chan);
+					Shocky.send(botForChannel,ETarget.Channel,botForChannel.getChannel(chan),null,">>> Quit: "+reason);
+				}
+			}
+			Shocky.die();
 			return;
 		}
 		

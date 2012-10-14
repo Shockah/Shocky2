@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
+import org.pircbotx.hooks.events.NickChangeEvent;
 import org.pircbotx.hooks.events.PartEvent;
 import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.smodule.login.LoginData;
@@ -14,7 +15,7 @@ public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 	public String getName() {return "login";}
 	public String getInfo() {return "Adds a login system";}
 	protected boolean isListener() {return true;}
-	protected boolean canDisable() {return false;}
+	public boolean canDisable() {return false;}
 	
 	public void onEnable() {
 		addCommands(new CommandLogin(this),new CommandRegister(this),new CommandPrivileges(this));
@@ -40,5 +41,8 @@ public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 	public void onPart(PartEvent<PircBotX> ev) {
 		ArrayList<Channel> channels = new ArrayList<Channel>(ev.getUser().getChannels());
 		if (channels.isEmpty() || (channels.size() == 1 && channels.get(0).getName().equals(ev.getChannel()))) LoginData.logout(ev.getUser().getNick());
+	}
+	public void onNickChange(NickChangeEvent<PircBotX> ev) {
+		LoginData.relog(ev.getOldNick(),ev.getNewNick());
 	}
 }

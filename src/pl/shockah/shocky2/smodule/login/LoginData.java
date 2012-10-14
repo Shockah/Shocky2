@@ -48,6 +48,16 @@ public final class LoginData {
 		}
 		return false;
 	}
+	public static boolean relog(String loginOld, String loginNew) {
+		loginOld = loginOld.toLowerCase();
+		loginNew = loginNew.toLowerCase();
+		
+		if (logout(loginOld)) {
+			list.add(loginNew);
+			return true;
+		}
+		return false;
+	}
 	
 	public static LoginData getLoginData(String login) {
 		return new LoginData(login);

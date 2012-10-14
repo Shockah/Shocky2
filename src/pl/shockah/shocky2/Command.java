@@ -1,13 +1,14 @@
 package pl.shockah.shocky2;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 
-public abstract class Command {
-	public static final List<Command> commands = Util.syncedList(Command.class);
+public abstract class Command implements Comparable<Command> {
+	private static final List<Command> commands = Util.syncedList(Command.class);
 	
 	public static void addCommands(Command... commands) {
 		for (Command cmd : commands) Command.commands.add(cmd);
@@ -24,6 +25,9 @@ public abstract class Command {
 		}
 		return null;
 	}
+	public static List<Command> getCommands() {
+		return new ArrayList<Command>(commands);
+	}
 	
 	protected int priority = 1;
 	
@@ -33,4 +37,8 @@ public abstract class Command {
 	
 	protected void onAdd() {}
 	protected void onRemove() {}
+	
+	public final int compareTo(Command command) {
+		return command().compareTo(command.command());
+	}
 }

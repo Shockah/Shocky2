@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
+import com.mongodb.DBObject;
 import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.Data;
@@ -22,13 +23,25 @@ public class CommandPrivileges extends Command {
 	
 	public String command() {return "privileges";}
 	public String help() {
-		return ".privileges <login> <privilege> - sets a privilege on login";
+		StringBuilder sb = new StringBuilder();
+		sb.append(".privileges <login> - retrieves login's permissions\n");
+		sb.append(".privileges <login> <privilege> - sets a privilege on login");
+		return sb.toString();
 	}
 	public void call(PircBotX bot, ETarget target, CommandCallback callback, Channel channel, User sender, String message) {
 		String[] split = message.split("\\s");
 		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 		
-		if (split.length == 3) {
+		if (split.length == 2) {
+			DBObject find = parent.getCollection().findOne(Data.document("login",split[1].toLowerCase()));
+			if (find == null) {
+				callback.append("No such login.");
+				return;
+			} else {
+				callback.append("Privileges for "+find.get("login")+": "+find.get("privileges"));
+				return;
+			}
+		} else if (split.length == 3) {
 			LoginData ld = sender == null ? null : LoginData.getLoginData(sender.getNick());
 			String privilege = split[2];
 			
