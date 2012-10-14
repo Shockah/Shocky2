@@ -1,8 +1,5 @@
 package pl.shockah.shocky2;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
@@ -11,17 +8,8 @@ import org.pircbotx.hooks.events.MessageEvent;
 public class Shocky extends ShockyListenerAdapter {
 	public static BotManager botManager;
 	public static String quitMessage = "";
-	public static URLClassLoader botClassLoader = null;
-	
-	static {
-		try {
-			botClassLoader = new URLClassLoader(new URL[]{new File("modules").toURI().toURL()});
-		} catch (Exception e) {handle(e);}
-	}
 	
 	public static void main(String[] args) {
-		Thread.currentThread().setContextClassLoader(botClassLoader);
-		
 		Data.initMongo();
 		botManager = new BotManager();
 		for (Module module : Module.loadNewModules()) System.out.println("Loaded module: "+module.getName());
@@ -50,7 +38,7 @@ public class Shocky extends ShockyListenerAdapter {
 	
 	public void onMessage(MessageEvent<PircBotX> event) {
 		if (event.getMessage().length() <= 1) return;
-		if (!((String)Data.getDB().getCollection("config").findOne(Data.document("key","bot->commandChars")).get("value")).contains(""+event.getMessage().charAt(0))) return;
+		if (!((String)Data.getCollection().findOne(Data.document("key","bot->commandChars")).get("value")).contains(""+event.getMessage().charAt(0))) return;
 		
 		CommandCallback callback = new CommandCallback();
 		callback.targetUser = event.getUser();
@@ -87,6 +75,20 @@ public class Shocky extends ShockyListenerAdapter {
 	}
 	public static void die(String reason) {
 		for (PircBotX bot : botManager.bots) for (Module module : Module.getModules()) module.onDie(bot);
-		for (PircBotX bot : botManager.bots) bot.disconnect();
+		for (PircBotX bot : botManager.bots) bot.quitServer(reason);
+		killMe();
+	}
+	private static void killMe() {
+		while (true) {
+			for (PircBotX bot : botManager.bots) if (bot.isConnected()) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {e.printStackTrace();}
+				continue;
+			}
+			break;
+		}
+		
+		System.exit(0);
 	}
 }

@@ -2,6 +2,7 @@ package pl.shockah.shocky2;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +24,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 			urls.add(new File("modules").toURI().toURL());
 			urls.addAll(Arrays.asList(extraURLs));
 		} catch (Exception e) {Shocky.handle(e);}
-		return new ParentLastURLClassLoader(urls);
+		return new URLClassLoader(urls.toArray(new URL[urls.size()]));
 	}
 	
 	public static Module load(ModuleSource<?> source) {
@@ -52,8 +53,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		try {
 			Class<?> c = null;
 			if (source.source instanceof String) {
-				String s = (String)source.source;
-				c = (s.equals("StaticModule") || s.endsWith(".StaticModule") ? Shocky.botClassLoader : createClassLoader()).loadClass((String)source.source);
+				c = createClassLoader().loadClass((String)source.source);
 			} else if (source.source instanceof File) {
 				File file = (File)source.source;
 				String moduleName = file.getName(); 

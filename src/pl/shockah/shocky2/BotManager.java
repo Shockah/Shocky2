@@ -17,7 +17,7 @@ public class BotManager {
 	
 	public PircBotX createBot() {
 		try {
-			DBCollection c = Data.getDB().getCollection("config");
+			DBCollection c = Data.getCollection();
 			String sub = "bot";
 			
 			PircBotX bot = new PircBotX();
@@ -84,14 +84,14 @@ public class BotManager {
 		if (getBotForChannel(channel) != null) return null;
 		for (int i = 0; i < bots.size(); i++) {
 			PircBotX bot = bots.get(i);
-			if (bot.getChannels().size() < (Integer)Data.getDB().getCollection("config").findOne(Data.document("key","bot->maxChannels")).get("value")) {
+			if (bot.getChannels().size() < (Integer)Data.getCollection().findOne(Data.document("key","bot->maxChannels")).get("value")) {
 				bot.joinChannel(channel);
 				return bot;
 			}
 		}
 		
 		try {
-			DBCollection c = Data.getDB().getCollection("config");
+			DBCollection c = Data.getCollection();
 			
 			PircBotX bot = createBot();
 			bot.connect((String)c.findOne(Data.document("key","bot->server")).get("value"),(Integer)c.findOne(Data.document("key","bot->port")).get("value"));

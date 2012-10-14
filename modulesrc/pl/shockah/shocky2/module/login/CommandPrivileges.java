@@ -1,5 +1,6 @@
 package pl.shockah.shocky2.module.login;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.pircbotx.Channel;
@@ -7,10 +8,18 @@ import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
+import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.ETarget;
-import pl.shockah.shocky2.Shocky;
+import pl.shockah.shocky2.Util;
+import pl.shockah.shocky2.smodule.login.LoginData;
 
 public class CommandPrivileges extends Command {
+	protected final Module parent;
+	
+	public CommandPrivileges(Module parent) {
+		this.parent = parent;
+	}
+	
 	public String command() {return "privileges";}
 	public String help() {
 		return ".privileges <login> <privilege> - sets a privilege on login";
@@ -20,7 +29,7 @@ public class CommandPrivileges extends Command {
 		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 		
 		if (split.length == 3) {
-			LoginData ld = LoginData.getLoginData(sender);
+			LoginData ld = sender == null ? null : LoginData.getLoginData(sender.getNick());
 			String privilege = split[2];
 			
 			Pattern pattern = Pattern.compile("([\\+\\-])([a-zA-Z])[a-zA-Z]*");
@@ -33,12 +42,13 @@ public class CommandPrivileges extends Command {
 						if (channel != null) {
 							if (target == ETarget.Console || ld.isOp(channel.getName())) {
 								if (LoginData.loginExists(split[1])) {
-									LoginData ld2 = LoginData.getLoginData(Shocky.botManager.getUserWithName(split[1]));
-									System.out.println(ld2.getPrivileges().size());
+									LoginData ld2 = LoginData.getLoginData(split[1]);
 									if (ld2.getPrivileges().contains("+"+c+channel.getName().toLowerCase()) != set) {
-										if (set) LoginData.getPrivileges(split[1]).add("+"+c+channel.getName().toLowerCase());
-										else LoginData.getPrivileges(split[1]).remove("+"+c+channel.getName().toLowerCase());
+										ArrayList<String> privileges = new ArrayList<String>(ld2.getPrivileges());
+										if (set) privileges.add("+"+c+channel.getName().toLowerCase());
+										else privileges.remove("+"+c+channel.getName().toLowerCase());
 										
+										parent.getCollection().update(Data.document("login",ld2.getLogin()),Data.document("$set",Data.document("privileges",privileges.toArray(new String[privileges.size()]))));
 										callback.append("Done.");
 										return;
 									}
@@ -56,11 +66,13 @@ public class CommandPrivileges extends Command {
 					case 'c': {
 						if (target == ETarget.Console || ld.isController()) {
 							if (LoginData.loginExists(split[1])) {
-								LoginData ld2 = LoginData.getLoginData(Shocky.botManager.getUserWithName(split[1]));
+								LoginData ld2 = LoginData.getLoginData(split[1]);
 								if (ld2.isController() != set) {
-									if (set) LoginData.getPrivileges(split[1]).add("+c");
-									else LoginData.getPrivileges(split[1]).remove("+c");
+									ArrayList<String> privileges = new ArrayList<String>(ld2.getPrivileges());
+									if (set) privileges.add("+c");
+									else privileges.remove("+c");
 									
+									parent.getCollection().update(Data.document("login",ld2.getLogin()),Data.document("$set",Data.document("privileges",Util.implode(privileges," "))));
 									callback.append("Done.");
 									return;
 								}

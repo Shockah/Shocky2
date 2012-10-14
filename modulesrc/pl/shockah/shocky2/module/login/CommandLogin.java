@@ -9,6 +9,7 @@ import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.ETarget;
 import pl.shockah.shocky2.Shocky;
+import pl.shockah.shocky2.smodule.login.LoginData;
 
 public class CommandLogin extends Command {
 	protected final Module parent;
@@ -26,11 +27,11 @@ public class CommandLogin extends Command {
 		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 		
 		if (split.length == 2) {
-			LoginData ld = LoginData.getLoginData(sender);
+			LoginData ld = LoginData.getLoginData(sender.getNick());
 			if (!ld.isLoggedIn()) {
 				if (LoginData.loginExists(sender.getNick())) {
 					try {
-						callback.append(LoginData.login(sender,Security.md5(split[1]+(String)parent.getCollection().findOne(Data.document("key","md5extra")).get("value"))) ? "Logged in" : "Incorrect password");
+						callback.append(LoginData.login(sender.getNick(),Security.md5(split[1]+(String)Data.getCollection().findOne(Data.document("key",parent.getName()+"->md5extra")).get("value"))) ? "Logged in." : "Incorrect password.");
 						return;
 					} catch (Exception e) {Shocky.handle(e);}
 				}

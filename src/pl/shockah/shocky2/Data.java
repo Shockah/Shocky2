@@ -14,7 +14,7 @@ public class Data {
 			mongo = new Mongo();
 			db = mongo.getDB("shocky2");
 			
-			DBCollection c = db.getCollection("config");
+			DBCollection c = getCollection();
 			String sub = "bot";
 			Object[] o = new Object[]{
 					"verbose",true,
@@ -31,7 +31,7 @@ public class Data {
 				BasicDBObject doc = document("key",sub+"->"+o[i]);
 				if (c.findOne(doc) == null) {
 					doc.put("value",o[i+1] instanceof Object[] ? document((Object[])o[i+1]) : o[i+1]);
-					System.out.println(c.insert(doc));
+					c.insert(doc);
 				}
 			}
 		} catch (Exception e) {Shocky.handle(e);}
@@ -42,6 +42,9 @@ public class Data {
 	}
 	public static DB getDB() {
 		return db;
+	}
+	public static DBCollection getCollection() {
+		return db.getCollection("config");
 	}
 	
 	public static BasicDBObject document(Object... o) {

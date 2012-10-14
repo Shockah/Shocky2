@@ -9,6 +9,7 @@ import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.ETarget;
 import pl.shockah.shocky2.Shocky;
+import pl.shockah.shocky2.smodule.login.LoginData;
 
 public class CommandRegister extends Command {
 	protected final Module parent;
@@ -26,11 +27,11 @@ public class CommandRegister extends Command {
 		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 		
 		if (split.length == 2) {
-			LoginData ld = LoginData.getLoginData(sender);
+			LoginData ld = LoginData.getLoginData(sender.getNick());
 			if (!ld.isLoggedIn()) {
 				if (!LoginData.loginExists(sender.getNick())) {
 					try {
-						LoginData.register(sender,Security.md5(split[1]+(String)parent.getCollection().findOne(Data.document("key","md5extra")).get("value")));
+						LoginData.register(sender.getNick(),Security.md5(split[1]+(String)Data.getCollection().findOne(Data.document("key",parent.getName()+"->md5extra")).get("value")));
 						callback.append("Registered, logged in.");
 						return;
 					} catch (Exception e) {Shocky.handle(e);}

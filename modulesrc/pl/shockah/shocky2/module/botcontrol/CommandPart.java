@@ -8,7 +8,7 @@ import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.ETarget;
 import pl.shockah.shocky2.Shocky;
-import pl.shockah.shocky2.module.login.LoginData;
+import pl.shockah.shocky2.smodule.login.LoginData;
 
 public class CommandPart extends Command {
 	public String command() {return "part";}
@@ -20,7 +20,7 @@ public class CommandPart extends Command {
 	}
 	public void call(PircBotX bot, ETarget target, CommandCallback callback, Channel channel, User sender, String message) {
 		String[] split = message.split("\\s");
-		LoginData ld = LoginData.getLoginData(sender);
+		LoginData ld = LoginData.getLoginData(sender.getNick());
 		
 		if (split.length == 1) {
 			commandPart(callback,channel.getName(),target,ld);
