@@ -19,7 +19,7 @@ public class CommandYouTube extends CommandWithAliases {
 	public String help() {
 		return ".youtube {query} - returns YouTube search result";
 	}
-	public void onAdd() {
+	protected void onAdd() {
 		addAlias("yt");
 		super.onAdd();
 	}

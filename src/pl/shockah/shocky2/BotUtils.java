@@ -79,7 +79,7 @@ l1:		for (int i = 0; i < spl.length; i++) {
 				if (regexNick(user.getNick().toLowerCase()).matcher(spl[i].toLowerCase()).find()) spl[i] = mungeNick(spl[i]);
 			}
 		}
-		return StringTools.implode(spl," ");
+		return Util.implode(spl," ");
 	}
 	public static String mungeNick(String nick) {
 		char[] chars = nick.toCharArray();
@@ -125,20 +125,20 @@ l1:		for (int i = 0; i < spl.length; i++) {
 	public static String timeAgo(Date date) {return timeAgo(date,new Date());}
 	public static String timeAgo(Date from, Date to) {
 		long dif = (to.getTime()-from.getTime())/1000;
-		int s,m,h,d,w;
+		int s,m,h,d,y;
 		StringBuilder sb = new StringBuilder();
 		
 		s = (int)dif%60; dif /= 60;
 		m = (int)dif%60; dif /= 60;
 		h = (int)dif%24; dif /= 24;
-		d = (int)dif%7; dif /= 7;
-		w = (int)dif;
+		d = (int)dif%365; dif /= 365;
+		y = (int)dif;
 		
-		if (w > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+w+"w");}
-		if (w+d > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+d+"d");}
-		if (w+d+h > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+h+"h");}
-		if (w+d+h+m > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+m+"m");}
-		if (w+d+h+m+s > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+s+"s");}
+		if (y > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+y+"y");}
+		if (y+d > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+d+"d");}
+		if (y+d+h > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+h+"h");}
+		if (y+d+h+m > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+m+"m");}
+		if (y+d+h+m+s > 0) {if (sb.length() != 0) sb.append(" "); sb.append(""+s+"s");}
 		if (sb.length() == 0) return "now";
 		sb.append(" ago");
 		return sb.toString();

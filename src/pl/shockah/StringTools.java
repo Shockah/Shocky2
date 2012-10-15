@@ -85,46 +85,52 @@ public class StringTools {
 		return output;
 	}
 	
-    public static String deleteWhitespace(CharSequence str) {
-        StringBuilder sb = new StringBuilder(str.length());
-        for (int i = 0; i < str.length(); i++) {
-        	char c = str.charAt(i);
-            if (i > 0 && Character.isWhitespace(c) && Character.isWhitespace(str.charAt(i-1)))
-                continue;
-            if (c == '\r' || c == '\n') {
-            	sb.append(' ');
-            	continue;
-            }
-            sb.append(c);
-        }
-        return sb.toString();
-    }
-    
-    public static String formatLines(CharSequence str) {
-    	StringBuffer sb = new StringBuffer(str.length());
-    	Matcher m = controlCharPattern.matcher(str);
-    	while(m.find()) {
-    		String newline = m.group(2);
-    		String tab = m.group(3);
-    		if (!m.hitEnd()) {
-    			if (newline != null)
-    				m.appendReplacement(sb, " | ");
-    			else if (tab != null)
-    				m.appendReplacement(sb, ",");
-    		}
-    	}
-    	m.appendTail(sb);
-		return sb.toString();
-    }
-	
-	public static <T> String implode(T[] spl, String separator) {return implode(spl,0,spl.length-1,separator);}
-	public static <T> String implode(T[] spl, int a, String separator) {return implode(spl,a,spl.length-1,separator);}
-	public static <T> String implode(T[] spl, int a, int b, String separator) {
-		StringBuffer sb = new StringBuffer();
-		while (a <= b) {
-			if (sb.length() != 0) sb.append(separator);
-			sb.append(spl[a++]);
+	public static String deleteWhitespace(CharSequence str) {
+		StringBuilder sb = new StringBuilder(str.length());
+		for (int i = 0; i < str.length(); i++) {
+			char c = str.charAt(i);
+			if (i > 0 && Character.isWhitespace(c) && Character.isWhitespace(str.charAt(i-1)))
+				continue;
+			if (c == '\r' || c == '\n') {
+				sb.append(' ');
+				continue;
+			}
+			sb.append(c);
 		}
 		return sb.toString();
+	}
+	
+	public static String formatLines(CharSequence str) {
+		StringBuffer sb = new StringBuffer(str.length());
+		Matcher m = controlCharPattern.matcher(str);
+		while(m.find()) {
+			String newline = m.group(2);
+			String tab = m.group(3);
+			if (!m.hitEnd()) {
+				if (newline != null)
+					m.appendReplacement(sb, " | ");
+				else if (tab != null)
+					m.appendReplacement(sb, ",");
+			}
+		}
+		m.appendTail(sb);
+		return sb.toString();
+	}
+	
+	public static boolean isInt(String s) {
+		try {
+			Integer.parseInt(s);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+	public static boolean isFloat(String s) {
+		try {
+			Float.parseFloat(s);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 }

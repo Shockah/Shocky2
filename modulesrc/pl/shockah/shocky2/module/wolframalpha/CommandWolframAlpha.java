@@ -19,7 +19,7 @@ public class CommandWolframAlpha extends CommandWithAliases {
 	public String help() {
 		return ".wolframalpha {query} - returns WolframAlpha result";
 	}
-	public void onAdd() {
+	protected void onAdd() {
 		addAlias("wa");
 		super.onAdd();
 	}
