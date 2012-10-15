@@ -35,7 +35,7 @@ public class BotUtils {
 	}
 	public static String shortenUrl(String url, String channel) {
 		try {
-			String bitLyUser = (String)Data.get("bitly->user",channel), bitLyAPIKey = (String)Data.get("bitly->apiKey",channel);
+			String bitLyUser = (String)Data.get(channel,"bitly->user"), bitLyAPIKey = (String)Data.get(channel,"bitly->apiKey");
 			if (bitLyUser == null || bitLyAPIKey == null) return url;
 			
 			HTTPQuery q = new HTTPQuery("http://api.bitly.com/v3/shorten?"+HTTPQuery.parseArgs("format","txt","login",bitLyUser,"apiKey",bitLyAPIKey,"longUrl",url));

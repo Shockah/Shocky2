@@ -79,7 +79,7 @@ public class CommandSet extends Command {
 						}
 					}
 					Data.getCollection().update(Data.document("key",key),doc,true,false);
-					callback.append("Set "+aKey+" "+(aChannel == null ? "" : "for channel "+aChannel+" ")+" to "+matcher.group(2));
+					callback.append("Set "+aKey+" "+(aChannel == null ? "" : "for channel "+aChannel+" ")+"to "+matcher.group(2));
 				} else callback.append("Incorrect value, required format: {type}:{value}");
 			}
 		} else callback.append("Restricted command.");

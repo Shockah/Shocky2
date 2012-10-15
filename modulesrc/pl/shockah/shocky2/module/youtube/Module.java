@@ -107,9 +107,6 @@ public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 			}
 		}
 	}
-	public void onDisable() {
-		super.onDisable();
-	}
 	
 	public void onMessage(MessageEvent<PircBotX> event) {
 		if ((Boolean)Data.get(event.getChannel().getName(),getName()+"->nowPlayingMessage")) {

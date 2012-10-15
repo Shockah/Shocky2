@@ -71,7 +71,7 @@ public class Shocky extends ShockyListenerAdapter {
 	}
 	public static void die(String reason) {
 		for (PircBotX bot : botManager.bots) for (Module module : Module.getModules()) module.onDie(bot);
-		for (PircBotX bot : botManager.bots) bot.quitServer(reason);
+		for (PircBotX bot : botManager.bots) if (reason == null) bot.quitServer(); else bot.quitServer(reason);
 		killMe();
 	}
 	private static void killMe() {
