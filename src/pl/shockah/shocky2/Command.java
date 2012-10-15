@@ -22,6 +22,7 @@ public abstract class Command implements Comparable<Command> {
 			cmd.onRemove();
 		}
 	}
+	//TODO make the command list channel(config(enabled modules))-dependant
 	public static Command getCommand(String name) {
 		name = name.toLowerCase();
 		Collections.sort(commands,new CommandComparator(true));

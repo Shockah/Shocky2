@@ -103,12 +103,25 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 				disabled = new ArrayList<Module>();
 				disabledModules.put(channel, disabled);
 			} else disabled = disabledModules.get(channel);
-			return disabled.remove(module);
+			if (disabled.remove(module)) {
+				DBCollection c = Data.getDB().getCollection("modules");
+				BasicDBObject doc = Data.document("name",module.getName());
+				DBObject find = c.findOne(doc);
+				((DBObject)find.get("enabled")).put(channel,true);
+				c.update(doc,find);
+				return true;
+			} else return false;
 		} else {
 			if (modulesOn.contains(module)) return false;
 			module.onEnable();
 			if (module.isListener()) Shocky.botManager.listenerManager.addListener(module);
 			modulesOn.add(module);
+			
+			DBCollection c = Data.getDB().getCollection("modules");
+			BasicDBObject doc = Data.document("name",module.getName());
+			DBObject find = c.findOne(doc);
+			((DBObject)find.get("enabled")).put("^",true);
+			c.update(doc,find);
 			return true;
 		}
 	}
@@ -121,12 +134,25 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 				disabledModules.put(channel, disabled);
 			} else disabled = disabledModules.get(channel);
 			if (disabled.contains(module)) return false;
-			return disabled.add(module);
+			if (disabled.add(module)) {
+				DBCollection c = Data.getDB().getCollection("modules");
+				BasicDBObject doc = Data.document("name",module.getName());
+				DBObject find = c.findOne(doc);
+				((DBObject)find.get("enabled")).put(channel,false);
+				c.update(doc,find);
+				return true;
+			} else return false;
 		} else {
 			if (!modulesOn.contains(module)) return false;
 			if (module.isListener()) Shocky.botManager.listenerManager.removeListener(module);
 			module.onDisable();
 			modulesOn.remove(module);
+			
+			DBCollection c = Data.getDB().getCollection("modules");
+			BasicDBObject doc = Data.document("name",module.getName());
+			DBObject find = c.findOne(doc);
+			((DBObject)find.get("enabled")).put("^",false);
+			c.update(doc,find);
 			return true;
 		}
 	}

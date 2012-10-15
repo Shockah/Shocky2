@@ -117,15 +117,15 @@ public class CommandModule extends Command {
 			if (split[1].equalsIgnoreCase("enable") || split[1].equalsIgnoreCase("on")) {
 				String aChannel = split[2].equals(".") ? channel.getName() : split[2];
 				if (!ld.isOp(aChannel)) callback.append("Restricted command."); else {
-					pl.shockah.shocky2.Module module = pl.shockah.shocky2.Module.getModuleByName(split[2]);
+					pl.shockah.shocky2.Module module = pl.shockah.shocky2.Module.getModuleByName(split[3]);
 					callback.append(module == null ? "No such module." : (module.enable(aChannel) ? "Enabled." : "Failed."));
 				}
 				return;
 			} else if (split[1].equalsIgnoreCase("disable") || split[1].equalsIgnoreCase("off")) {
 				String aChannel = split[2].equals(".") ? channel.getName() : split[2];
 				if (!ld.isOp(aChannel)) callback.append("Restricted command."); else {
-					pl.shockah.shocky2.Module module = pl.shockah.shocky2.Module.getModuleByName(split[2]);
-					callback.append(module == null ? "No such module." : (module.disable(aChannel) ? "Enabled." : "Failed."));
+					pl.shockah.shocky2.Module module = pl.shockah.shocky2.Module.getModuleByName(split[3]);
+					callback.append(module == null ? "No such module." : (module.disable(aChannel) ? "Disabled." : "Failed."));
 				}
 				return;
 			}
