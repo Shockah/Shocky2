@@ -147,7 +147,7 @@ public class CommandModule extends Command {
 				if (first) first = false; else callback.append(", ");
 				if (on && off) callback.append(enabled ? Colors.DARK_GREEN : Colors.BROWN);
 				callback.append(module.getName());
-				if (on && off) callback.append("\017");
+				if (on && off) callback.append(Colors.NORMAL);
 			}
 		}
 		
