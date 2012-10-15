@@ -33,7 +33,7 @@ public class Shocky extends ShockyListenerAdapter {
 		CommandCallback callback = new CommandCallback();
 		callback.targetUser = event.getUser();
 		callback.targetChannel = event.getChannel();
-		Command cmd = Command.getCommand(event.getMessage().substring(1).split("\\s")[0]);
+		Command cmd = Command.getCommand(event.getMessage().substring(1).split("\\s")[0],event.getChannel().getName());
 		if (cmd != null) cmd.call(event.getBot(),ETarget.Channel,callback,event.getChannel(),event.getUser(),event.getMessage());
 		if (callback.length() > 0) {
 			if (callback.target == ETarget.Channel) {

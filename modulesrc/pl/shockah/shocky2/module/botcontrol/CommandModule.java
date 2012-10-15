@@ -8,9 +8,14 @@ import org.pircbotx.User;
 import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.ETarget;
+import pl.shockah.shocky2.Module;
 import pl.shockah.shocky2.smodule.login.LoginData;
 
 public class CommandModule extends Command {
+	public CommandModule(Module module) {
+		super(module);
+	}
+	
 	public String command() {return "module";}
 	public String help() {
 		StringBuilder sb = new StringBuilder();

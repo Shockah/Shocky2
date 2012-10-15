@@ -11,10 +11,15 @@ import pl.shockah.StringTools;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.CommandWithAliases;
 import pl.shockah.shocky2.ETarget;
+import pl.shockah.shocky2.Module;
 import pl.shockah.shocky2.Shocky;
 import pl.shockah.shocky2.Util;
 
 public class CommandGoogleImages extends CommandWithAliases {
+	public CommandGoogleImages(Module module) {
+		super(module);
+	}
+	
 	public String command() {return "googleimages";}
 	public String help() {
 		return ".googleimages {query} - returns Google Images search result";

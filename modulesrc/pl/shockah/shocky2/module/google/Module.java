@@ -5,6 +5,6 @@ public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 	public String getInfo() {return "Google (Image) search";}
 	
 	public void onEnable() {
-		addCommands(new CommandGoogle(),new CommandGoogleImages());
+		addCommands(new CommandGoogle(this),new CommandGoogleImages(this));
 	}
 }

@@ -8,8 +8,13 @@ import org.pircbotx.User;
 import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.ETarget;
+import pl.shockah.shocky2.Module;
 
 public class CommandHelp extends Command {
+	public CommandHelp(Module module) {
+		super(module);
+	}
+	
 	public String command() {return "help";}
 	public String help() {
 		StringBuilder sb = new StringBuilder();
@@ -29,6 +34,6 @@ public class CommandHelp extends Command {
 		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 		
 		String[] split = message.split("\\s");
-		callback.append((split.length == 1 || split.length > 2 ? this : Command.getCommand(split[1])).help());
+		callback.append((split.length == 1 || split.length > 2 ? this : Command.getCommand(split[1],channel == null ? null : channel.getName())).help());
 	}
 }

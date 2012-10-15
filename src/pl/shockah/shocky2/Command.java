@@ -22,16 +22,17 @@ public abstract class Command implements Comparable<Command> {
 			cmd.onRemove();
 		}
 	}
-	//TODO make the command list channel(config(enabled modules))-dependant
-	public static Command getCommand(String name) {
+	public static Command getCommand(String name, String channel) {
 		name = name.toLowerCase();
 		Collections.sort(commands,new CommandComparator(true));
 		for (int i = 0; i < commands.size(); i++) {
 			Command cmd = commands.get(i);
+			if (channel != null && !cmd.module.isEnabled(channel)) continue;
 			if (cmd.command().toLowerCase().equals(name)) return cmd;
 		}
 		for (int i = 0; i < commands.size(); i++) {
 			Command cmd = commands.get(i);
+			if (channel != null && !cmd.module.isEnabled(channel)) continue;
 			if (cmd.command().toLowerCase().startsWith(name)) return cmd;
 		}
 		return null;
@@ -45,7 +46,12 @@ public abstract class Command implements Comparable<Command> {
 		return new ArrayList<Command>(commands);
 	}
 	
+	protected final Module module;
 	protected int priority = 1;
+	
+	public Command(Module module) {
+		this.module = module;
+	}
 	
 	public abstract String command();
 	public abstract String help();

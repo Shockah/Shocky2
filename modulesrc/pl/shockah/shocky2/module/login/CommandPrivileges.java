@@ -11,14 +11,13 @@ import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.ETarget;
+import pl.shockah.shocky2.Module;
 import pl.shockah.shocky2.Util;
 import pl.shockah.shocky2.smodule.login.LoginData;
 
 public class CommandPrivileges extends Command {
-	protected final Module parent;
-	
-	public CommandPrivileges(Module parent) {
-		this.parent = parent;
+	public CommandPrivileges(Module module) {
+		super(module);
 	}
 	
 	public String command() {return "privileges";}
@@ -33,7 +32,7 @@ public class CommandPrivileges extends Command {
 		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 		
 		if (split.length == 2) {
-			DBObject find = parent.getCollection().findOne(Data.document("login",split[1].toLowerCase()));
+			DBObject find = module.getCollection().findOne(Data.document("login",split[1].toLowerCase()));
 			if (find == null) {
 				callback.append("No such login.");
 				return;
@@ -61,7 +60,7 @@ public class CommandPrivileges extends Command {
 										if (set) privileges.add("+"+c+channel.getName().toLowerCase());
 										else privileges.remove("+"+c+channel.getName().toLowerCase());
 										
-										parent.getCollection().update(Data.document("login",ld2.getLogin()),Data.document("$set",Data.document("privileges",privileges.toArray(new String[privileges.size()]))));
+										module.getCollection().update(Data.document("login",ld2.getLogin()),Data.document("$set",Data.document("privileges",privileges.toArray(new String[privileges.size()]))));
 										callback.append("Done.");
 										return;
 									}
@@ -85,7 +84,7 @@ public class CommandPrivileges extends Command {
 									if (set) privileges.add("+c");
 									else privileges.remove("+c");
 									
-									parent.getCollection().update(Data.document("login",ld2.getLogin()),Data.document("$set",Data.document("privileges",Util.implode(privileges," "))));
+									module.getCollection().update(Data.document("login",ld2.getLogin()),Data.document("$set",Data.document("privileges",Util.implode(privileges," "))));
 									callback.append("Done.");
 									return;
 								}

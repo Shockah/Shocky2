@@ -11,10 +11,15 @@ import pl.shockah.StringTools;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.CommandWithAliases;
 import pl.shockah.shocky2.ETarget;
+import pl.shockah.shocky2.Module;
 import pl.shockah.shocky2.Shocky;
 import pl.shockah.shocky2.Util;
 
 public class CommandGoogle extends CommandWithAliases {
+	public CommandGoogle(Module module) {
+		super(module);
+	}
+	
 	public String command() {return "google";}
 	public String help() {
 		return ".google {query} - returns Google search result";

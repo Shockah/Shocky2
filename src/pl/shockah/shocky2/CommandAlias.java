@@ -9,6 +9,7 @@ public class CommandAlias extends Command {
 	protected final String name;
 	
 	public CommandAlias(Command command, String name) {
+		super(command.module);
 		this.command = command;
 		this.name = name;
 		priority = 0;

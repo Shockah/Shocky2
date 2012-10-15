@@ -9,11 +9,16 @@ import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.ETarget;
+import pl.shockah.shocky2.Module;
 import pl.shockah.shocky2.Util;
 import pl.shockah.shocky2.smodule.login.LoginData;
 import com.mongodb.BasicDBObject;
 
 public class CommandSet extends Command {
+	public CommandSet(Module module) {
+		super(module);
+	}
+	
 	public String command() {return "set";}
 	public String help() {
 		StringBuilder sb = new StringBuilder();

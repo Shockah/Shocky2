@@ -11,7 +11,15 @@ public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 	public boolean canDisable() {return false;}
 	
 	public void onEnable() {
-		addCommands(new CommandHelp(),new CommandJoin(),new CommandPart(),new CommandDie(),new CommandGet(),new CommandSet(),new CommandModule());
+		addCommands(
+			new CommandHelp(this),
+			new CommandJoin(this),
+			new CommandPart(this),
+			new CommandDie(this),
+			new CommandGet(this),
+			new CommandSet(this),
+			new CommandModule(this)
+		);
 	}
 	
 	public void onInvite(InviteEvent<PircBotX> event) {

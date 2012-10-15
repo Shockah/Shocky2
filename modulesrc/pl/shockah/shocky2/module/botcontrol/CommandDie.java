@@ -6,11 +6,16 @@ import org.pircbotx.User;
 import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.ETarget;
+import pl.shockah.shocky2.Module;
 import pl.shockah.shocky2.Shocky;
 import pl.shockah.shocky2.Util;
 import pl.shockah.shocky2.smodule.login.LoginData;
 
 public class CommandDie extends Command {
+	public CommandDie(Module module) {
+		super(module);
+	}
+	
 	public String command() {return "die";}
 	public String help() {
 		return ".die [reason] - shutdowns the bot";

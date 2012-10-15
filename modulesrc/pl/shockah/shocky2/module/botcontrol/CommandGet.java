@@ -7,9 +7,14 @@ import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.Data;
 import pl.shockah.shocky2.ETarget;
+import pl.shockah.shocky2.Module;
 import pl.shockah.shocky2.smodule.login.LoginData;
 
 public class CommandGet extends Command {
+	public CommandGet(Module module) {
+		super(module);
+	}
+	
 	public String command() {return "get";}
 	public String help() {
 		return ".get [.|channel] {key} - retrieves a value from bot's config (. = current channel)";

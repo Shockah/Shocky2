@@ -6,10 +6,15 @@ import org.pircbotx.User;
 import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
 import pl.shockah.shocky2.ETarget;
+import pl.shockah.shocky2.Module;
 import pl.shockah.shocky2.Shocky;
 import pl.shockah.shocky2.smodule.login.LoginData;
 
 public class CommandJoin extends Command {
+	public CommandJoin(Module module) {
+		super(module);
+	}
+	
 	public String command() {return "join";}
 	public String help() {
 		return ".join <channel> - joins <channel>";
