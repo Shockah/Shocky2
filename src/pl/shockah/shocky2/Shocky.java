@@ -20,16 +20,6 @@ public class Shocky extends ShockyListenerAdapter {
 		tci.start();
 		
 		botManager.joinChannel("#shocky");
-		
-		/*Runtime.getRuntime().addShutdownHook(new Thread(){
-			public void run() {
-				for (PircBotX bot : botManager.bots) bot.quitServer(quitMessage);
-				for (Module module : Module.getModules()) {
-					module.onDataSave();
-					module.onDisable();
-				}
-			}
-		});*/
 	}
 	
 	public static void handle(Throwable t) {
@@ -58,8 +48,14 @@ public class Shocky extends ShockyListenerAdapter {
 		send(bot,callback.target,callback.targetChannel,callback.targetUser,callback.toString());
 	}
 	public static void send(PircBotX bot, ETarget target, Channel channel, User user, String message) {
-		String[] lines = message.split("\\\n");
+		if ((Boolean)Data.get(channel == null ? null : channel.getName(),"bot->stripBeep")) message.replace("\7","");
 		
+		if (target != ETarget.Console) {
+			int limit = (Integer)Data.get(channel == null ? null : channel.getName(),"bot->maxMessageLength");
+			if (message.length() > limit) message = message.subSequence(0,limit-3)+"...";
+		}
+		
+		String[] lines = message.split("\\\n");
 		for (String line : lines) {
 			switch (target) {
 				case Console: System.out.println(line); break;

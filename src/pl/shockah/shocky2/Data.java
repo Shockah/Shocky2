@@ -26,7 +26,9 @@ public class Data {
 					"login","Shocky",
 					"messageDelay",500L,
 					"maxChannels",50,
-					"commandChars","."
+					"maxMessageLength",400,
+					"commandChars",".",
+					"stripBeep",true
 			};
 			for (int i = 0; i < o.length; i += 2) {
 				BasicDBObject doc = document("key",sub+"->"+o[i]);

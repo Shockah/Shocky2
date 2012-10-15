@@ -6,7 +6,7 @@ public abstract class CommandWithAliases extends Command {
 	protected final List<String> aliasName = Util.syncedList(String.class);
 	protected final List<CommandAlias> aliases = Util.syncedList(CommandAlias.class);
 	
-	public void addAlias(String name, int priority) {
+	public void addAlias(String name) {
 		aliasName.add(name);
 	}
 	public void removeAlias(String name) {
