@@ -4,6 +4,8 @@ import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import org.pircbotx.hooks.events.MessageEvent;
+import org.pircbotx.hooks.events.NoticeEvent;
+import org.pircbotx.hooks.events.PrivateMessageEvent;
 
 public class Shocky extends ShockyListenerAdapter {
 	public static BotManager botManager;
@@ -42,6 +44,24 @@ public class Shocky extends ShockyListenerAdapter {
 			}
 			send(event.getBot(),callback);
 		}
+	}
+	public void onPrivateMessage(PrivateMessageEvent<PircBotX> event) {
+		CommandCallback callback = new CommandCallback();
+		callback.targetUser = event.getUser();
+		callback.targetChannel = null;
+		callback.target = ETarget.Private;
+		Command cmd = Command.getCommand(event.getMessage().split("\\s")[0],null);
+		if (cmd != null) cmd.call(event.getBot(),ETarget.Channel,callback,null,event.getUser(),event.getMessage());
+		if (callback.length() > 0) send(event.getBot(),callback);
+	}
+	public void onNotice(NoticeEvent<PircBotX> event) {
+		CommandCallback callback = new CommandCallback();
+		callback.targetUser = event.getUser();
+		callback.targetChannel = null;
+		callback.target = ETarget.Notice;
+		Command cmd = Command.getCommand(event.getMessage().split("\\s")[0],null);
+		if (cmd != null) cmd.call(event.getBot(),ETarget.Channel,callback,null,event.getUser(),event.getMessage());
+		if (callback.length() > 0) send(event.getBot(),callback);
 	}
 	
 	public static void send(PircBotX bot, CommandCallback callback) {
