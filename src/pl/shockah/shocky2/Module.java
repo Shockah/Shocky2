@@ -57,7 +57,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 			} else if (source.source instanceof File) {
 				File file = (File)source.source;
 				String moduleName = file.getName(); 
-				if (moduleName.equals("Module.class") || moduleName.equals("StaticModule.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString();
+				if (moduleName.equals("Module.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString();
 				else return null;
 				
 				c = createClassLoader().loadClass(moduleName);
@@ -67,7 +67,7 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 				StringBuilder sb = new StringBuilder(moduleName).reverse();
 				moduleName = new StringBuilder(sb.substring(0,sb.indexOf("/"))).reverse().toString();
 				String modulePath = new StringBuilder(url.toString()).delete(0,url.toString().length()-moduleName.length()).toString();
-				if (moduleName.equals("Module.class") || moduleName.equals("StaticModule.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString();
+				if (moduleName.equals("Module.class")) moduleName = new StringBuilder(moduleName).reverse().delete(0,6).reverse().toString();
 				else return null;
 				
 				c = createClassLoader(new URL(modulePath)).loadClass(moduleName);
