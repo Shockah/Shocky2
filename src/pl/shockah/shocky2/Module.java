@@ -79,19 +79,21 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		return module;
 	}
 	public static boolean unload(Module module) {
+		return unload(module,false);
+	}
+	private static boolean unload(Module module, boolean reloading) {
 		if (module == null) return false;
 		if (!modules.contains(module)) return false;
-		if (modulesOn.contains(module)) disable(module,null);
+		if (modulesOn.contains(module)) disable(module,null,true);
 		modules.remove(module);
 		return true;
 	}
 	public static boolean reload(Module module) {
-		//TODO figure out why reloading changes module's state
 		if (module == null) return false;
 		ModuleSource<?> src = module.source;
 		Module m = load(src,false);
 		if (m != null) {
-			unload(module);
+			unload(module,true);
 			return true;
 		} else return false;
 	}
@@ -127,8 +129,12 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 		}
 	}
 	public static boolean disable(Module module, String channel) {
+		return disable(module,channel,false);
+	}
+	private static boolean disable(Module module, String channel, boolean reloading) {
 		if (module == null) return false;
 		if (channel != null) {
+			assert !reloading;
 			List<Module> disabled;
 			if (!disabledModules.containsKey(channel)) {
 				disabled = new ArrayList<Module>();
@@ -149,17 +155,21 @@ public abstract class Module extends ShockyListenerAdapter implements Comparable
 			module.onDisable();
 			modulesOn.remove(module);
 			
-			DBCollection c = Data.getDB().getCollection("modules");
-			BasicDBObject doc = Data.document("name",module.getName());
-			DBObject find = c.findOne(doc);
-			((DBObject)find.get("enabled")).put("^",false);
-			c.update(doc,find);
+			if (!reloading) {
+				DBCollection c = Data.getDB().getCollection("modules");
+				BasicDBObject doc = Data.document("name",module.getName());
+				DBObject find = c.findOne(doc);
+				((DBObject)find.get("enabled")).put("^",false);
+				c.update(doc,find);
+			}
 			return true;
 		}
 	}
 	
 	public static ArrayList<Module> getModules() {
-		return new ArrayList<Module>(modules);
+		ArrayList<Module> ret = new ArrayList<Module>(modules);
+		Collections.sort(ret);
+		return ret;
 	}
 	public static Module getModuleByName(String name) {
 		for (int i = 0; i < modules.size(); i++) if (modules.get(i).getName().equals(name)) return modules.get(i);

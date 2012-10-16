@@ -143,7 +143,7 @@ public class CommandModule extends Command {
 		boolean first = true;
 		for (pl.shockah.shocky2.Module module : pl.shockah.shocky2.Module.getModules()) {
 			boolean enabled = module.isEnabled(null);
-			if (enabled && on) {
+			if ((enabled && on) || (!enabled && off)) {
 				if (first) first = false; else callback.append(", ");
 				if (on && off) callback.append(enabled ? Colors.DARK_GREEN : Colors.BROWN);
 				callback.append(module.getName());
