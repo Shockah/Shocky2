@@ -1,10 +1,8 @@
 package pl.shockah.shocky2.module.seen;
 
 import java.util.Date;
-
 import org.pircbotx.PircBotX;
 import org.pircbotx.hooks.events.MessageEvent;
-
 import pl.shockah.shocky2.Data;
 
 public final class Module extends pl.shockah.shocky2.ModuleWithCommands {

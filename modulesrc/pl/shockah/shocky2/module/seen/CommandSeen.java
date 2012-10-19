@@ -1,12 +1,10 @@
 package pl.shockah.shocky2.module.seen;
 
 import java.util.Date;
-
 import org.pircbotx.Channel;
 import org.pircbotx.PircBotX;
 import org.pircbotx.User;
 import com.mongodb.DBObject;
-
 import pl.shockah.shocky2.BotUtils;
 import pl.shockah.shocky2.Command;
 import pl.shockah.shocky2.CommandCallback;
