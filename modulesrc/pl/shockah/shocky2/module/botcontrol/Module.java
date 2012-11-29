@@ -18,7 +18,8 @@ public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 			new CommandDie(this),
 			new CommandGet(this),
 			new CommandSet(this),
-			new CommandModule(this)
+			new CommandModule(this),
+			new CommandAnnounce(this)
 		);
 	}
 	
