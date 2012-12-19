@@ -36,12 +36,16 @@ public class CommandGet extends Command {
 				return;
 			} else aKey = split[1];
 		} else {
+			if (channel == null && split[1].equals(".")) {
+				callback.append(help());
+				return;
+			}
 			aChannel = split[1].equals(".") ? channel.getName() : split[1];
 			aKey = split[2];
 		}
 		
-		LoginData ld = LoginData.getLoginData(sender.getNick());
-		if ((aChannel == null && ld.isController()) || (aChannel != null && ld.isOp(aChannel))) {
+		LoginData ld = sender == null ? null : LoginData.getLoginData(sender.getNick());
+		if (sender == null || (aChannel == null && ld.isController()) || (aChannel != null && ld.isOp(aChannel))) {
 			callback.append(aKey+": ");
 			
 			Object o = Data.get(aChannel,aKey);
