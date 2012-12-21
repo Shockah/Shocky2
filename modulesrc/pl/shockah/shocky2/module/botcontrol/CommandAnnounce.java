@@ -33,6 +33,7 @@ public class CommandAnnounce extends Command {
 			for (String channelName : Shocky.botManager.getChannels()) {
 				Shocky.send(Shocky.botManager.getBotForChannel(channelName),ETarget.Channel,Shocky.botManager.getChannelWithName(channelName),null,msg);
 			}
+			return;
 		}
 		
 		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;

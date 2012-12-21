@@ -50,8 +50,8 @@ public class CommandSet extends Command {
 			aValue = Util.implode(split,3," ");
 		}
 		
-		LoginData ld = LoginData.getLoginData(sender.getNick());
-		if ((aChannel == null && ld.isController()) || (aChannel != null && ld.isOp(aChannel))) {
+		LoginData ld = sender == null ? null : LoginData.getLoginData(sender.getNick());
+		if ((aChannel == null && (ld == null || ld.isController())) || (aChannel != null && ld != null && ld.isOp(aChannel))) {
 			String key = aKey;
 			if (aChannel != null) key = aChannel+"->"+key;
 			
