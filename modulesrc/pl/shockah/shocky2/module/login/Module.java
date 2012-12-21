@@ -18,7 +18,7 @@ public final class Module extends pl.shockah.shocky2.ModuleWithCommands {
 	public boolean canDisable() {return false;}
 	
 	public void onEnable() {
-		addCommands(new CommandLogin(this),new CommandRegister(this),new CommandPrivileges(this));
+		addCommands(new CommandLogin(this),new CommandRegister(this),new CommandLogout(this),new CommandPrivileges(this));
 		
 		Random rnd = new Random();
 		String chars = "0123456789abcdef";

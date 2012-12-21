@@ -25,28 +25,30 @@ public class CommandRegister extends Command {
 		String[] split = message.split("\\s");
 		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 		
-		if (channel != null) {
-			callback.append("Security risk! Aborting register process.");
-			return;
-		}
-		
-		if (split.length == 2) {
-			LoginData ld = LoginData.getLoginData(sender.getNick());
-			if (!ld.isLoggedIn()) {
-				if (!LoginData.loginExists(sender.getNick())) {
-					try {
-						LoginData.register(sender.getNick(),Security.md5(split[1]+(String)Data.getCollection().findOne(Data.document("key",module.getName()+"->md5extra")).get("value")));
-						callback.append("Registered, logged in.");
-						return;
-					} catch (Exception e) {Shocky.handle(e);}
-				}
-				
-				callback.append("Login already exists; use .login instead");
+		if (sender != null) {
+			if (channel != null) {
+				callback.append("Security risk! Aborting register process.");
 				return;
 			}
 			
-			callback.append("Already logged in.");
-			return;
+			if (split.length == 2) {
+				LoginData ld = LoginData.getLoginData(sender.getNick());
+				if (!ld.isLoggedIn()) {
+					if (!LoginData.loginExists(sender.getNick())) {
+						try {
+							LoginData.register(sender.getNick(),Security.md5(split[1]+(String)Data.getCollection().findOne(Data.document("key",module.getName()+"->md5extra")).get("value")));
+							callback.append("Registered, logged in.");
+							return;
+						} catch (Exception e) {Shocky.handle(e);}
+					}
+					
+					callback.append("Login already exists; use .login instead");
+					return;
+				}
+				
+				callback.append("Already logged in.");
+				return;
+			}
 		}
 		
 		callback.append(help());
