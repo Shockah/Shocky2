@@ -25,6 +25,11 @@ public class CommandRegister extends Command {
 		String[] split = message.split("\\s");
 		if (callback.target != ETarget.Console) callback.target = ETarget.Notice;
 		
+		if (channel != null) {
+			callback.append("Security risk! Aborting register process.");
+			return;
+		}
+		
 		if (split.length == 2) {
 			LoginData ld = LoginData.getLoginData(sender.getNick());
 			if (!ld.isLoggedIn()) {

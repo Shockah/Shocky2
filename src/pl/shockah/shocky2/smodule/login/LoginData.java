@@ -39,6 +39,13 @@ public final class LoginData {
 		list.add(login);
 		return true;
 	}
+	public static boolean setPassword(String login, String password) {
+		login = login.toLowerCase();
+		
+		if (!loginExists(login)) return false;
+		pl.shockah.shocky2.Module.getCollection("login").update(Data.document("login",login),Data.document("$set",Data.document("pass",password)));
+		return true;
+	}
 	public static boolean logout(String login) {
 		login = login.toLowerCase();
 		
